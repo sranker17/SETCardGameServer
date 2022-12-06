@@ -50,10 +50,4 @@ public class ScoreboardController {
     public List<Scoreboard> topScores() {
         return scoreboardService.findTopScores();
     }
-
-    @GetMapping("/init")
-    public void initPlayerScore(){
-        Scoreboard scoreboard = new Scoreboard(UUID.randomUUID(), "Normal", 10, 100);
-        scoreboardService.addScore(scoreboard);
-    }
 }

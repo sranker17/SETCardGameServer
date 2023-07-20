@@ -1,6 +1,13 @@
-FROM openjdk:11
+# Build the application first using Maven
+FROM maven:3.8-openjdk-11 as build
+WORKDIR /app
+COPY . .
+RUN mvn install
+
+# Inject the JAR file into a new container to keep the file small
+FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY --from=build /app/target/set-card-game-server.jar /app/app.jar
 EXPOSE 8080
-RUN mkdir /opt/SET
-WORKDIR /opt/SET
-ADD target/set-card-game-server.jar set-card-game-server.jar
-ENTRYPOINT ["java","-jar","./set-card-game-server.jar"]
+ENTRYPOINT ["sh", "-c"]
+CMD ["java -jar app.jar"]

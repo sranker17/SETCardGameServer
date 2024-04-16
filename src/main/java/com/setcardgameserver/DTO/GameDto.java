@@ -1,6 +1,7 @@
-package com.setcardgameserver.DTO;
+package com.setcardgameserver.dto;
 
-import com.setcardgameserver.Model.Card;
+import com.setcardgameserver.model.Card;
+import com.setcardgameserver.model.Game;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Data
-public class Game {
+public class GameDto {
     private int gameId;
     private UUID player1;
     private UUID player2;
@@ -19,7 +20,7 @@ public class Game {
     private Map<UUID, Integer> points;
     private ArrayList<Integer> nullCardIndexes;
 
-    public Game(com.setcardgameserver.Model.Game game) {
+    public GameDto(Game game) {
         this.gameId = game.getGameId();
         this.player1 = game.getPlayer1();
         this.player2 = game.getPlayer2();

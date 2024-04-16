@@ -1,4 +1,4 @@
-package com.setcardgameserver.Model;
+package com.setcardgameserver.model;
 
 public enum Color {
     GREEN("g"),

@@ -1,13 +1,15 @@
-package com.setcardgameserver.Model;
+package com.setcardgameserver.model;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
 @Data
+@Slf4j
 public class Game {
 
-    private final int BOARD_SIZE = 9;
+    private static final int BOARD_SIZE = 9;
     private int gameId;
     private UUID player1;
     private UUID player2;
@@ -39,9 +41,9 @@ public class Game {
         } while (!hasSet(board));
     }
 
-    public boolean hasSet(ArrayList<Card> cards) {
+    public boolean hasSet(List<Card> cards) {
         if (nullCardIndexes.size() == 9) {
-            System.out.println("doesn't have any more cards");
+            log.debug("doesn't have any more cards");
             return false;
         }
 
@@ -71,7 +73,7 @@ public class Game {
 
                                     if (!propertyChecks.contains(false)) {
                                         propertyChecks.clear();
-                                        System.out.println("i: " + i + " j: " + j + " k: " + k);
+                                        log.debug("i: " + i + " j: " + j + " k: " + k);
                                         return true;
                                     }
                                 }
@@ -81,7 +83,7 @@ public class Game {
                 }
             }
         }
-        System.out.println("doesn't have SET");
+        log.debug("doesn't have SET");
         return false;
     }
 
@@ -105,23 +107,23 @@ public class Game {
         selectedCardIndexes.clear();
     }
 
-    public ArrayList<Card> getCardsFromIndex(ArrayList<Integer> indexes) {
+    public List<Card> getCardsFromIndex(List<Integer> indexes) {
         ArrayList<Card> selectedCards = new ArrayList<>();
 
-        for (int i = 0; indexes.size() > i; i++) {
-            selectedCards.add(board.get(indexes.get(i)));
+        for (Integer index : indexes) {
+            selectedCards.add(board.get(index));
         }
 
         return selectedCards;
     }
 
     public void changeCardsOnBoard() {
-        for (int i = 0; selectedCardIndexes.size() > i; i++) {
-            if (cardDeck.size() > 0) {
-                board.set(selectedCardIndexes.get(i), cardDeck.get(0));
+        for (Integer selectedCardIndex : selectedCardIndexes) {
+            if (!cardDeck.isEmpty()) {
+                board.set(selectedCardIndex, cardDeck.get(0));
                 cardDeck.remove(0);
             } else {
-                nullCardIndexes.add(selectedCardIndexes.get(i));
+                nullCardIndexes.add(selectedCardIndex);
             }
         }
     }
@@ -130,10 +132,9 @@ public class Game {
         if (player1 != null && player2 != null) {
             if (points.get(player1) > points.get(player2)) {
                 return player1;
-            } else if (points.get(player1) < points.get(player2)){
+            } else if (points.get(player1) < points.get(player2)) {
                 return player2;
-            }
-            else if(points.get(player1) == points.get(player2)){
+            } else if (Objects.equals(points.get(player1), points.get(player2))) {
                 return UUID.randomUUID();
             }
         }

@@ -1,6 +1,6 @@
-package com.setcardgameserver.Storage;
+package com.setcardgameserver.storage;
 
-import com.setcardgameserver.Model.Game;
+import com.setcardgameserver.model.Game;
 
 import java.util.HashMap;
 import java.util.Map;

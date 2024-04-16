@@ -1,4 +1,4 @@
-package com.setcardgameserver.Model;
+package com.setcardgameserver.model;
 
 import lombok.Data;
 
@@ -7,7 +7,6 @@ public class Card {
     private Color color;
     private Shape shape;
     private Quantity quantity;
-
 
     public Card(Color color, Shape shape, Quantity quantity) {
         this.color = color;

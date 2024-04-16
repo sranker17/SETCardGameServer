@@ -1,11 +1,11 @@
-package com.setcardgameserver.Controller;
+package com.setcardgameserver.controller;
 
-import com.setcardgameserver.DTO.*;
-import com.setcardgameserver.Exception.InvalidGameException;
-import com.setcardgameserver.Exception.NotFoundException;
-import com.setcardgameserver.Service.GameService;
+import com.setcardgameserver.dto.*;
+import com.setcardgameserver.exception.InvalidGameException;
+import com.setcardgameserver.exception.NotFoundException;
+import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
-import org.json.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -15,113 +15,114 @@ import java.util.UUID;
 
 @Controller
 @AllArgsConstructor
+@Slf4j
 public class GameController {
 
     private final GameService gameService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private static final String TOPIC_WAITING = "/topic/waiting";
+    private static final String TOPIC_GAME_PROGRESS = "/topic/game-progress/";
+    private static final String TOPIC_DESTROYED = "/topic/destroyed/";
 
     @MessageMapping("/create")
-    public Game create(@RequestBody Player player) {
-        System.out.println("create private game request: " + player.getUsername());
+    public GameDto create(@RequestBody PlayerDto playerDto) {
+        log.debug("create private game request: {}", playerDto.getUsername());
 
-        Game game = null;
+        GameDto gameDto = null;
         try {
-            game = new Game(gameService.createGame(UUID.fromString(player.getUsername())));
-            simpMessagingTemplate.convertAndSend("/topic/waiting", game);
+            gameDto = new GameDto(gameService.createGame(UUID.fromString(playerDto.getUsername())));
+            simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
-
-        return game;
+        return gameDto;
     }
 
     @MessageMapping("/connect")
-    public Game connect(@RequestBody ConnectRequest request) {
-        System.out.println("connect to private game request: " + request.getGameId() + " " + request.getPlayerId());
+    public GameDto connect(@RequestBody ConnectRequestDto request) {
+        log.debug("connect to private game request: {} {}", request.getGameId(), request.getPlayerId());
 
-        Game game = new Game(gameService.connectToGame(request.getPlayerId(), request.getGameId()));
-        simpMessagingTemplate.convertAndSend("/topic/waiting", game);
-        return game;
+        GameDto gameDto = new GameDto(gameService.connectToGame(request.getPlayerId(), request.getGameId()));
+        simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
+        return gameDto;
     }
 
     @MessageMapping("/connect/random")
-    public Game connectRandom(@RequestBody Player player) {
-        System.out.println("connect random " + player.getUsername());
+    public GameDto connectRandom(@RequestBody PlayerDto playerDto) {
+        log.debug("connect random {}", playerDto.getUsername());
 
-        Game game = null;
+        GameDto gameDto = null;
         try {
-            game = new Game(gameService.connectToRandomGame(UUID.fromString(player.getUsername())));
-            simpMessagingTemplate.convertAndSend("/topic/waiting", game);
+            gameDto = new GameDto(gameService.connectToRandomGame(UUID.fromString(playerDto.getUsername())));
+            simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
-        return game;
+        return gameDto;
     }
 
     @MessageMapping("/start")
-    public Game startGame(@RequestBody GameId gameId) {
-        System.out.println("game started: " + gameId.getGameId());
+    public GameDto startGame(@RequestBody GameIdDto gameIdDto) {
+        log.debug("game started: {}", gameIdDto.getGameId());
 
-        Game game = null;
+        GameDto gameDto = null;
         try {
-            game = new Game(gameService.getGameById(gameId.getGameId()));
-            simpMessagingTemplate.convertAndSend("/topic/game-progress/" + gameId.getGameId(), game);
+            gameDto = new GameDto(gameService.getGameById(gameIdDto.getGameId()));
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameIdDto.getGameId(), gameDto);
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
-        return game;
+        return gameDto;
     }
 
     @MessageMapping("/gameplay")
-    public Game gameplay(@RequestBody Gameplay gameplay) {
-        System.out.println("gameplay: " + gameplay.getGameId() + " " + gameplay.getPlayerId());
+    public GameDto gameplay(@RequestBody GameplayDto gameplayDto) {
+        log.debug("gameplay: {} {}", gameplayDto.getGameId(), gameplayDto.getPlayerId());
 
-        Game game = null;
+        GameDto gameDto = null;
         try {
-            game = new Game(gameService.gameplay(gameplay));
-            simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-        } catch (InvalidGameException e) {
-            e.printStackTrace();
+            gameDto = new GameDto(gameService.gameplay(gameplayDto));
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
+        } catch (InvalidGameException | NotFoundException e) {
+            log.error(e.getMessage());
         }
-        return game;
+        return gameDto;
     }
 
     @MessageMapping("/gameplay/button")
-    public Game buttonPress(@RequestBody GameplayButtonPress buttonPress) {
-        System.out.println("buttonPress: " + buttonPress.getGameId() + " " + buttonPress.getPlayerId());
+    public GameDto buttonPress(@RequestBody GameplayButtonPress buttonPress) {
+        log.debug("buttonPress: {} {}", buttonPress.getGameId(), buttonPress.getPlayerId());
 
-        Game game = null;
+        GameDto gameDto = null;
         try {
-            game = new Game(gameService.buttonPress(buttonPress));
-            simpMessagingTemplate.convertAndSend("/topic/game-progress/" + game.getGameId(), game);
+            gameDto = new GameDto(gameService.buttonPress(buttonPress));
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
         } catch (InvalidGameException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
-        return game;
+        return gameDto;
     }
 
     @MessageMapping("/game/destroy")
-    public String destroyGame(@RequestBody GameId gameId) {
-        System.out.println("destroy game " + gameId.getGameId());
+    public String destroyGame(@RequestBody GameIdDto gameIdDto) {
+        log.debug("destroy game {}", gameIdDto.getGameId());
 
         try {
-            gameService.removeGame(gameId.getGameId());
+            gameService.removeGame(gameIdDto.getGameId());
         } catch (NotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
-        simpMessagingTemplate.convertAndSend("/topic/destroyed/" + gameId.getGameId(), "Done");
+        simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");
         return "Done";
     }
 
     @MessageMapping("/game/destroy/all")
-    public void destroyAllGames(@RequestBody Player player) {
-        System.out.println("destroy all games by " + player.getUsername());
+    public void destroyAllGames(@RequestBody PlayerDto playerDto) {
+        log.debug("destroy all games by {}", playerDto.getUsername());
 
         gameService.destroyAllGames();
     }

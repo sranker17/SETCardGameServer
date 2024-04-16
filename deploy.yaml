@@ -42,11 +42,6 @@ items:
             - image: sranker/set-card-game-server:latest
               imagePullPolicy: IfNotPresent
               name: set-card-game-server
-#              env:
-#                - name: FAVOURITE_CHEESE
-#                  valueFrom:
-#                    configMapKeyRef: my-configmap
-#                    key: thefavourite.cheese
               ports:
                 - containerPort: 8080
                   protocol: TCP

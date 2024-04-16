@@ -1,10 +1,11 @@
-package com.setcardgameserver.Model;
+package com.setcardgameserver.model;
 
-import lombok.Data;
+import lombok.Getter;
 
 import javax.persistence.*;
 import java.util.UUID;
 
+@Getter
 @Entity
 @Table
 public class Scoreboard {
@@ -57,25 +58,5 @@ public class Scoreboard {
                 ", score=" + score +
                 ", time=" + time +
                 '}';
-    }
-
-    public Long getScoreId() {
-        return scoreId;
-    }
-
-    public UUID getPlayerId() {
-        return playerId;
-    }
-
-    public String getDifficulty() {
-        return difficulty;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public int getTime() {
-        return time;
     }
 }

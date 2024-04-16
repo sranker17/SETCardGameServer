@@ -1,8 +1,8 @@
-package com.setcardgameserver.Service;
+package com.setcardgameserver.service;
 
-import com.setcardgameserver.Model.Scoreboard;
-import com.setcardgameserver.Repository.ScoreboardRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.setcardgameserver.model.Scoreboard;
+import com.setcardgameserver.repository.ScoreboardRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,14 +10,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class ScoreboardService {
 
     private final ScoreboardRepository scoreboardRepository;
-
-    @Autowired
-    public ScoreboardService(ScoreboardRepository scoreboardRepository) {
-        this.scoreboardRepository = scoreboardRepository;
-    }
 
     public List<Scoreboard> scoreboard() {
         return scoreboardRepository.findAll();
@@ -30,7 +26,7 @@ public class ScoreboardService {
             scoreboardRepository.save(newScore);
             return scoreboardRepository.findByScoreId(newScore.getScoreId());
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<Scoreboard> findPlayerScores(UUID playerId) {

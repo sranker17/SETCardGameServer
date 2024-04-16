@@ -1,14 +1,13 @@
-package com.setcardgameserver.DTO;
+package com.setcardgameserver.dto;
 
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class Gameplay {
-
+public class GameplayDto {
     private int gameId;
     private UUID playerId;
-    private boolean select;  //selected = true | deselected = false
+    private boolean select;  //selected = true | unselected = false
     private int selectedCardIndex;
 }

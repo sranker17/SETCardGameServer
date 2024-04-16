@@ -1,8 +1,8 @@
-package com.setcardgameserver.Controller;
+package com.setcardgameserver.controller;
 
-import com.setcardgameserver.Service.ScoreboardService;
-import com.setcardgameserver.Model.Scoreboard;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.setcardgameserver.model.Scoreboard;
+import com.setcardgameserver.service.ScoreboardService;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,13 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
+@AllArgsConstructor
 public class ScoreboardController {
     private final ScoreboardService scoreboardService;
-
-    @Autowired
-    public ScoreboardController(ScoreboardService scoreboardService) {
-        this.scoreboardService = scoreboardService;
-    }
 
     @GetMapping("/scoreboard")
     public List<Scoreboard> scoreboard() {

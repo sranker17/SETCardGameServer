@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class Scoreboard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long scoreId;
+    @Type(type = "org.hibernate.type.PostgresUUIDType")
     private UUID playerId;
     private String difficulty;
     private int score;

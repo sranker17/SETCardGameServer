@@ -1,13 +1,16 @@
 package com.setcardgameserver.controller;
 
-import com.setcardgameserver.model.Scoreboard;
+import com.setcardgameserver.dto.ScoreboardDto;
 import com.setcardgameserver.service.ScoreboardService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -15,16 +18,16 @@ public class ScoreboardController {
     private final ScoreboardService scoreboardService;
 
     @GetMapping("/scoreboard")
-    public List<Scoreboard> scoreboard() {
-        return scoreboardService.scoreboard();
+    public ResponseEntity<List<ScoreboardDto>> scoreboard() {
+        return status(HttpStatus.OK).body(scoreboardService.scoreboard());
     }
 
     @PostMapping("/scoreboard")
-    public Optional<Scoreboard> addScore(@RequestBody Scoreboard score) {
+    public ResponseEntity<ScoreboardDto> addScore(@RequestBody ScoreboardDto score) {
         if (score.getScore() > 0 && score.getScore() < 10 && score.getTime() > 0 && (score.getDifficulty().equals("Easy") || score.getDifficulty().equals("Normal"))) {
-            return scoreboardService.addScore(score);
+            return status(HttpStatus.CREATED).body(scoreboardService.addScore(score));
         }
-        return Optional.of(new Scoreboard());
+        return status(HttpStatus.BAD_REQUEST).body(null);
     }
 
     @DeleteMapping("/scoreboard")
@@ -33,17 +36,17 @@ public class ScoreboardController {
     }
 
     @GetMapping("/available")
-    public String available() {
-        return "available";
+    public ResponseEntity<String> available() {
+        return status(HttpStatus.OK).body("available");
     }
 
     @GetMapping("/scoreboard/player/{id}")
-    public List<Scoreboard> playerScores(@PathVariable("id") UUID playerId) {
-        return scoreboardService.findPlayerScores(playerId);
+    public ResponseEntity<List<ScoreboardDto>> playerScores(@PathVariable("id") UUID playerId) {
+        return status(HttpStatus.OK).body(scoreboardService.findPlayerScores(playerId));
     }
 
     @GetMapping("/scoreboard/top")
-    public List<Scoreboard> topScores() {
-        return scoreboardService.findTopScores();
+    public ResponseEntity<List<ScoreboardDto>> topScores() {
+        return status(HttpStatus.OK).body(scoreboardService.findTopScores());
     }
 }

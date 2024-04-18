@@ -20,7 +20,6 @@ import java.util.UUID;
 @Slf4j
 public class GameService {
 
-    private static final String GAME_NOT_FOUND = "Game not found";
     private static final Random random = new Random();
 
     public Game createGame(UUID player) throws NotFoundException {
@@ -31,7 +30,7 @@ public class GameService {
         if (hasGame.isPresent()) {
             Game game = GameStorage.getInstance().getGames().values().stream()
                     .filter(it -> it.getPlayer1().equals(player))
-                    .findFirst().orElseThrow(() -> new NotFoundException(GAME_NOT_FOUND));
+                    .findFirst().orElseThrow(() -> new NotFoundException("Game not found while creating game"));
             removeGame(game.getGameId());
         }
 
@@ -82,7 +81,7 @@ public class GameService {
         } else {
             game = GameStorage.getInstance().getGames().values().stream()
                     .filter(it -> it.getStatus().equals(GameStatus.NEW))
-                    .findFirst().orElseThrow(() -> new NotFoundException(GAME_NOT_FOUND));
+                    .findFirst().orElseThrow(() -> new NotFoundException("Game not found while connecting to random game"));
 
             if (game.getPlayer1().toString().equals(player2.toString())) {
                 removeGame(game.getGameId());
@@ -121,7 +120,7 @@ public class GameService {
 
     public Game buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, NotFoundException {
         if (!GameStorage.getInstance().getGames().containsKey(buttonPress.getGameId())) {
-            throw new NotFoundException(GAME_NOT_FOUND);
+            throw new NotFoundException( "Game not found on button press");
         }
 
         Game game = GameStorage.getInstance().getGames().get(buttonPress.getGameId());
@@ -153,7 +152,7 @@ public class GameService {
 
     public Game gameplay(GameplayDto gameplayDto) throws NotFoundException, InvalidGameException {
         if (!GameStorage.getInstance().getGames().containsKey(gameplayDto.getGameId())) {
-            throw new NotFoundException(GAME_NOT_FOUND);
+            throw new NotFoundException("Game not found while in gameplay");
         }
 
         Game game = GameStorage.getInstance().getGames().get(gameplayDto.getGameId());
@@ -191,14 +190,14 @@ public class GameService {
 
     public Game getGameById(int gameId) throws NotFoundException {
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
-            throw new NotFoundException(GAME_NOT_FOUND);
+            throw new NotFoundException("Game not found with id " + gameId);
         }
         return GameStorage.getInstance().getGames().get(gameId);
     }
 
     public void removeGame(int gameId) throws NotFoundException {
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
-            throw new NotFoundException(GAME_NOT_FOUND);
+            throw new NotFoundException("Game not found while removing game");
         }
 
         Game game = GameStorage.getInstance().getGames().get(gameId);

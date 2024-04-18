@@ -1,12 +1,14 @@
 package com.setcardgameserver.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
 @Data
 @Slf4j
+@NoArgsConstructor
 public class Game {
 
     private static final int BOARD_SIZE = 9;
@@ -21,6 +23,13 @@ public class Game {
     private ArrayList<Integer> selectedCardIndexes = new ArrayList<>();
     private Map<UUID, Integer> points = new HashMap<>();
     private ArrayList<Integer> nullCardIndexes = new ArrayList<>();
+    private boolean playerLeft = false;
+
+    public Game(int gameId, UUID winner, boolean playerLeft) {
+        this.gameId = gameId;
+        this.winner = winner;
+        this.playerLeft = playerLeft;
+    }
 
     public void createGame() {
         do {
@@ -73,7 +82,7 @@ public class Game {
 
                                     if (!propertyChecks.contains(false)) {
                                         propertyChecks.clear();
-                                        log.debug("i: " + i + " j: " + j + " k: " + k);
+                                        log.debug("i: {} j: {} k: {}", i, j, k);
                                         return true;
                                     }
                                 }

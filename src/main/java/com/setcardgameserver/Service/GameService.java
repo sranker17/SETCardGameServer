@@ -120,7 +120,8 @@ public class GameService {
 
     public Game buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, NotFoundException {
         if (!GameStorage.getInstance().getGames().containsKey(buttonPress.getGameId())) {
-            throw new NotFoundException( "Game not found on button press");
+            log.debug("Game not found on button press");
+            return new Game(buttonPress.getGameId(), buttonPress.getPlayerId(), true);
         }
 
         Game game = GameStorage.getInstance().getGames().get(buttonPress.getGameId());

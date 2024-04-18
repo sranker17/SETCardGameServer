@@ -9,6 +9,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ScoreboardMapper {
     Scoreboard dtoToEntity(ScoreboardDto scoreboardDto);
+
     ScoreboardDto entityToDto(Scoreboard scoreboard);
+
     List<ScoreboardDto> entityListToDto(List<Scoreboard> scoreboardList);
 }

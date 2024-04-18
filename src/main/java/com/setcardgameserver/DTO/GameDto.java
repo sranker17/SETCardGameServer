@@ -2,13 +2,17 @@ package com.setcardgameserver.dto;
 
 import com.setcardgameserver.model.Card;
 import com.setcardgameserver.model.Game;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class GameDto {
     private int gameId;
     private UUID player1;
@@ -19,16 +23,5 @@ public class GameDto {
     private ArrayList<Integer> selectedCardIndexes;
     private Map<UUID, Integer> points;
     private ArrayList<Integer> nullCardIndexes;
-
-    public GameDto(Game game) {
-        this.gameId = game.getGameId();
-        this.player1 = game.getPlayer1();
-        this.player2 = game.getPlayer2();
-        this.board = game.getBoard();
-        this.winner = game.getWinner();
-        this.blockedBy = game.getBlockedBy();
-        this.selectedCardIndexes = game.getSelectedCardIndexes();
-        this.points = game.getPoints();
-        this.nullCardIndexes = game.getNullCardIndexes();
-    }
+    private boolean playerLeft;
 }

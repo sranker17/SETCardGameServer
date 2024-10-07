@@ -1,12 +1,8 @@
 package com.setcardgameserver.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.Type;
+import jakarta.persistence.*;
+import lombok.*;
 
-import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
@@ -15,23 +11,18 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Scoreboard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SCORE_ID")
     private Long scoreId;
-    @Type(type = "org.hibernate.type.PostgresUUIDType")
+    @Column(name = "PLAYER_ID")
     private UUID playerId;
+    @Column(name = "DIFFICULTY")
     private String difficulty;
+    @Column(name = "SCORE")
     private int score;
+    @Column(name = "TIME")
     private int time;
-
-    @Override
-    public String toString() {
-        return "Scoreboard{" +
-                "playerId=" + playerId +
-                ", difficulty='" + difficulty + '\'' +
-                ", score=" + score +
-                ", time=" + time +
-                '}';
-    }
 }

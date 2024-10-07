@@ -9,5 +9,4 @@ public class InvalidGameException extends Exception {
     public InvalidGameException(String message) {
         this.message = message;
     }
-
 }

@@ -1,8 +1,10 @@
 package com.setcardgameserver.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class Card {
     private Color color;
     private Shape shape;
@@ -12,10 +14,5 @@ public class Card {
         this.color = color;
         this.shape = shape;
         this.quantity = quantity;
-    }
-
-    @Override
-    public String toString() {
-        return color.label + shape.label + quantity.label;
     }
 }

@@ -2,15 +2,12 @@ package com.setcardgameserver.service;
 
 import com.setcardgameserver.dto.ScoreboardDto;
 import com.setcardgameserver.mapper.ScoreboardMapper;
-import com.setcardgameserver.mapper.ScoreboardMapperImpl;
 import com.setcardgameserver.model.Scoreboard;
 import com.setcardgameserver.repository.ScoreboardRepository;
 import lombok.AllArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

@@ -23,6 +23,7 @@ public class GameService {
     private static final Random random = new Random();
 
     public Game createGame(UUID player) throws NotFoundException {
+        log.info("Creating game for player: {}", player);
         Optional<Game> hasGame = GameStorage.getInstance().getGames().values().stream()
                 .filter(it -> it.getPlayer1().equals(player))
                 .findFirst();
@@ -52,6 +53,7 @@ public class GameService {
     }
 
     public Game connectToGame(UUID player2, int gameId) {
+        log.info("Connecting player to game: {}", player2);
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
             return new Game();
         }
@@ -70,6 +72,7 @@ public class GameService {
     }
 
     public Game connectToRandomGame(UUID player2) throws NotFoundException {
+        log.info("Connecting player to random game: {}", player2);
         Game game;
         Optional<Game> hasGame = GameStorage.getInstance().getGames().values().stream()
                 .filter(it -> it.getStatus().equals(GameStatus.NEW))
@@ -107,6 +110,7 @@ public class GameService {
     }
 
     public Game createNewRandomGame(UUID player) {
+        log.info("Creating new random game for player: {}", player);
         Game newGame = new Game();
         newGame.createGame();
         newGame.setGameId(random.nextInt(99999));
@@ -203,7 +207,7 @@ public class GameService {
 
         Game game = GameStorage.getInstance().getGames().get(gameId);
         GameStorage.getInstance().removeGame(game);
-        log.debug("Game removed\n");
+        log.debug("Game removed");
     }
 
     public void destroyAllGames() {

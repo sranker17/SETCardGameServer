@@ -10,10 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 @Slf4j
 public class DeleteGamesTimer {
-
     @Scheduled(cron = "0 0 1 * * ?", zone = "CET")
     public void deleteGames() {
         GameStorage.getInstance().removeAllGames();
-        log.debug("Deleted all the stuck games.");
+        log.info("Deleted all the stuck games.");
     }
 }

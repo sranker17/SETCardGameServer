@@ -1,6 +1,6 @@
 package com.setcardgameserver.mapper;
 
-import com.setcardgameserver.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.ScoreboardDto;
 import com.setcardgameserver.model.Scoreboard;
 import org.mapstruct.Mapper;
 

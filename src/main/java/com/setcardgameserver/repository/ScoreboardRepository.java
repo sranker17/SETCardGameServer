@@ -2,20 +2,16 @@ package com.setcardgameserver.repository;
 
 import com.setcardgameserver.model.Scoreboard;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ScoreboardRepository extends JpaRepository<Scoreboard, Long> {
 
-    @Query("SELECT s FROM Scoreboard s WHERE s.scoreId = ?1")
-    Optional<Scoreboard> findByScoreId(Long scoreId);
+    List<Scoreboard> findByUserIdOrderByDifficultyDescScoreDescTimeAsc(UUID userId);
 
-    List<Scoreboard> findByPlayerIdOrderByDifficultyDescScoreDescTimeAsc(UUID playerId);
-
+    //TODO create separate for top 100s for each difficulty
     List<Scoreboard> findByOrderByDifficultyDescScoreDescTimeAsc();
 }

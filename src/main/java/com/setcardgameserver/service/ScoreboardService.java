@@ -1,6 +1,6 @@
 package com.setcardgameserver.service;
 
-import com.setcardgameserver.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.ScoreboardDto;
 import com.setcardgameserver.mapper.ScoreboardMapper;
 import com.setcardgameserver.model.Scoreboard;
 import com.setcardgameserver.repository.ScoreboardRepository;
@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @Service
 @AllArgsConstructor
@@ -25,14 +27,19 @@ public class ScoreboardService {
     }
 
     public ScoreboardDto addScore(ScoreboardDto newScore) {
-        log.info("Adding score to scoreboard: {}", newScore);
-        Scoreboard saved = scoreboardRepository.save(scoreboardMapper.dtoToEntity(newScore));
-        return scoreboardMapper.entityToDto(saved);
+        //TODO add validation service with more validations all around
+        if (newScore.getScore() > 0 && newScore.getScore() < 10 && newScore.getTime() > 0 && (newScore.getDifficulty().equals("Easy") || newScore.getDifficulty().equals("Normal"))) {
+            log.info("Adding score to scoreboard: {}", newScore);
+            Scoreboard saved = scoreboardRepository.save(scoreboardMapper.dtoToEntity(newScore));
+            return scoreboardMapper.entityToDto(saved);
+        } else {
+            throw new IllegalArgumentException("Invalid score");
+        }
     }
 
-    public List<ScoreboardDto> findPlayerScores(UUID playerId) {
-        log.info("Getting scores for player: {}", playerId);
-        return scoreboardMapper.entityListToDto(scoreboardRepository.findByPlayerIdOrderByDifficultyDescScoreDescTimeAsc(playerId));
+    public List<ScoreboardDto> findUserScores(UUID userId) {
+        log.info("Getting scores for user: {}", userId);
+        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUserIdOrderByDifficultyDescScoreDescTimeAsc(userId));
     }
 
     public List<ScoreboardDto> findTopScores() {

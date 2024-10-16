@@ -15,6 +15,8 @@
     <name>SETCardGameServer</name>
     <description>SET Card Game Server for saving scores and hosting multiplayer games.</description>
     <properties>
+<!--        TODO check if this works-->
+        <spring-boot.run.jvmArguments>-Duser.timezone=UTC</spring-boot.run.jvmArguments>
         <java.version>17</java.version>
         <org.mapstruct.version>1.6.2</org.mapstruct.version>
         <springframework.version>4.3.4.RELEASE</springframework.version>
@@ -26,6 +28,7 @@
         <org.webjars.jquery.version>3.7.1</org.webjars.jquery.version>
         <org.json.version>20231013</org.json.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <io.jsonwebtoken.jwt.version>0.11.5</io.jsonwebtoken.jwt.version>
     </properties>
     <dependencies>
         <dependency>
@@ -35,6 +38,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -94,6 +101,21 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${io.jsonwebtoken.jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${io.jsonwebtoken.jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${io.jsonwebtoken.jwt.version}</version>
         </dependency>
     </dependencies>
 

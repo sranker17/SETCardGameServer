@@ -1,11 +1,11 @@
-package com.setcardgameserver.dto;
+package com.setcardgameserver.model.dto;
 
 import lombok.Data;
 
 import java.util.UUID;
 
 @Data
-public class ConnectRequestDto {
+public class GameplayButtonPress {
     private int gameId;
     private UUID playerId;
 }

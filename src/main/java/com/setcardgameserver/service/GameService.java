@@ -1,7 +1,7 @@
 package com.setcardgameserver.service;
 
-import com.setcardgameserver.dto.GameplayButtonPress;
-import com.setcardgameserver.dto.GameplayDto;
+import com.setcardgameserver.model.dto.GameplayButtonPress;
+import com.setcardgameserver.model.dto.GameplayDto;
 import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.exception.NotFoundException;
 import com.setcardgameserver.model.Game;

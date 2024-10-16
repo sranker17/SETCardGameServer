@@ -1,37 +1,34 @@
 package com.setcardgameserver.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
-@Entity
 @Table
+@Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Accessors(chain = true)
 @ToString
-public class Scoreboard {
+public class Role implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
     private Long id;
 
-    @Column(name = "UserID", nullable = false)
-    private UUID userId;
+    @Column(name = "Name", unique = true, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
 
-    @Column(name = "Difficulty", nullable = false)
-    private String difficulty;
-
-    @Column(name = "Score", nullable = false)
-    private int score;
-
-    @Column(name = "Time", nullable = false)
-    private int time;
+    @Column(name = "Description", nullable = false)
+    private String description;
 
     @CreationTimestamp
     @Column(updatable = false, name = "CreatedAt")

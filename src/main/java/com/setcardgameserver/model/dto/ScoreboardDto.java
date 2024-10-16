@@ -1,4 +1,4 @@
-package com.setcardgameserver.dto;
+package com.setcardgameserver.model.dto;
 
 import lombok.Data;
 
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 public class ScoreboardDto {
-    private UUID playerId;
+    private UUID userId;
     private String difficulty;
     private int score;
     private int time;

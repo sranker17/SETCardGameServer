@@ -1,7 +1,6 @@
-package com.setcardgameserver.dto;
+package com.setcardgameserver.model.dto;
 
 import com.setcardgameserver.model.Card;
-import com.setcardgameserver.model.Game;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

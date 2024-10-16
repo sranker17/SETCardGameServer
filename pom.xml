@@ -16,9 +16,16 @@
     <description>SET Card Game Server for saving scores and hosting multiplayer games.</description>
     <properties>
         <java.version>17</java.version>
-        <org.mapstruct.version>1.6.0.Beta1</org.mapstruct.version>
+        <org.mapstruct.version>1.6.2</org.mapstruct.version>
         <springframework.version>4.3.4.RELEASE</springframework.version>
         <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
+        <org.webjars.sockjs-client.version>1.5.1</org.webjars.sockjs-client.version>
+        <org.jetbrains.annotations.version>26.0.1</org.jetbrains.annotations.version>
+        <org.webjars.stomp-websocket.version>2.3.4</org.webjars.stomp-websocket.version>
+        <org.webjars.bootstrap.version>5.3.3</org.webjars.bootstrap.version>
+        <org.webjars.jquery.version>3.7.1</org.webjars.jquery.version>
+        <org.json.version>20231013</org.json.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,7 +58,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>24.1.0</version>
+            <version>${org.jetbrains.annotations.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -61,27 +68,27 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>sockjs-client</artifactId>
-            <version>1.5.1</version>
+            <version>${org.webjars.sockjs-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>stomp-websocket</artifactId>
-            <version>2.3.4</version>
+            <version>${org.webjars.stomp-websocket.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
-            <version>5.3.3</version>
+            <version>${org.webjars.bootstrap.version}</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery</artifactId>
-            <version>3.7.1</version>
+            <version>${org.webjars.jquery.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20231013</version>
+            <version>${org.json.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -99,7 +106,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>

@@ -8,15 +8,15 @@ import com.setcardgameserver.model.dto.RegisterUserDto;
 import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -24,29 +24,28 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public User signup(RegisterUserDto input) {
-        Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.USER);
-
-        if (optionalRole.isEmpty()) {
-            return null;
-        }
+        log.info("Creating user: {}", input.getUsername());
+        Role optionalRole = roleRepository.findByName(RoleEnum.USER)
+                .orElseThrow();
 
         User user = new User()
                 .setUsername(input.getUsername())
                 .setPassword(passwordEncoder.encode(input.getPassword()))
-                .setRole(optionalRole.get());
+                .setRole(optionalRole);
 
         return userRepository.save(user);
     }
 
     public User authenticate(LoginUserDto input) {
+        log.info("Authenticating user: {}", input.getUsername());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getUserName(),
+                        input.getUsername(),
                         input.getPassword()
                 )
         );
 
-        return userRepository.findByUsername(input.getUserName())
+        return userRepository.findByUsername(input.getUsername())
                 .orElseThrow();
     }
 }

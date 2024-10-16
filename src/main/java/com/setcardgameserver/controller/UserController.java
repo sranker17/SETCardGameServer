@@ -26,9 +26,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/all")
-    public ResponseEntity<List<User>> allUsers() {
-        List<User> users = userService.allUsers();
-
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDto>> allUsers() {
+        return ResponseEntity.ok(userService.allUsers());
     }
 }

@@ -1,5 +1,6 @@
 package com.setcardgameserver.service;
 
+import com.setcardgameserver.model.User;
 import com.setcardgameserver.model.dto.ScoreboardDto;
 import com.setcardgameserver.mapper.ScoreboardMapper;
 import com.setcardgameserver.model.Scoreboard;
@@ -9,17 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
-
-import static org.springframework.http.ResponseEntity.status;
 
 @Service
 @AllArgsConstructor
 @Slf4j
 public class ScoreboardService {
-
     private final ScoreboardRepository scoreboardRepository;
     private final ScoreboardMapper scoreboardMapper;
+    private final UserService userService;
 
     public List<ScoreboardDto> scoreboard() {
         log.info("Getting scoreboard");
@@ -37,9 +35,11 @@ public class ScoreboardService {
         }
     }
 
-    public List<ScoreboardDto> findUserScores(UUID userId) {
-        log.info("Getting scores for user: {}", userId);
-        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUserIdOrderByDifficultyDescScoreDescTimeAsc(userId));
+    public List<ScoreboardDto> findUserScores(String username) {
+        //TODO validate if username is the same as the logged in user
+        log.info("Getting scores for user: {}", username);
+        User user = userService.findByUsername(username);
+        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUserIdOrderByDifficultyDescScoreDescTimeAsc(user.getId()));
     }
 
     public List<ScoreboardDto> findTopScores() {

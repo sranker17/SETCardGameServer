@@ -1,11 +1,11 @@
 package com.setcardgameserver.service;
 
-import com.setcardgameserver.model.dto.GameplayButtonPress;
-import com.setcardgameserver.model.dto.GameplayDto;
 import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.exception.NotFoundException;
 import com.setcardgameserver.model.Game;
 import com.setcardgameserver.model.GameStatus;
+import com.setcardgameserver.model.dto.GameplayButtonPress;
+import com.setcardgameserver.model.dto.GameplayDto;
 import com.setcardgameserver.storage.GameStorage;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Slf4j
 public class GameService {
-
     private static final Random random = new Random();
 
     public Game createGame(UUID player) throws NotFoundException {
@@ -123,6 +122,7 @@ public class GameService {
     }
 
     public Game buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, NotFoundException {
+        log.info("Button pressed: {}", buttonPress.getPlayerId());
         if (!GameStorage.getInstance().getGames().containsKey(buttonPress.getGameId())) {
             log.debug("Game not found on button press");
             return new Game(buttonPress.getGameId(), buttonPress.getPlayerId(), true);
@@ -156,6 +156,7 @@ public class GameService {
     }
 
     public Game gameplay(GameplayDto gameplayDto) throws NotFoundException, InvalidGameException {
+        log.info("Gameplay: {}", gameplayDto.getPlayerId());
         if (!GameStorage.getInstance().getGames().containsKey(gameplayDto.getGameId())) {
             throw new NotFoundException("Game not found while in gameplay");
         }
@@ -194,6 +195,7 @@ public class GameService {
     }
 
     public Game getGameById(int gameId) throws NotFoundException {
+        log.info("Getting game by id: {}", gameId);
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
             throw new NotFoundException("Game not found with id " + gameId);
         }
@@ -201,16 +203,17 @@ public class GameService {
     }
 
     public void removeGame(int gameId) throws NotFoundException {
+        log.info("Removing game: {}", gameId);
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
             throw new NotFoundException("Game not found while removing game");
         }
 
         Game game = GameStorage.getInstance().getGames().get(gameId);
         GameStorage.getInstance().removeGame(game);
-        log.debug("Game removed");
     }
 
     public void destroyAllGames() {
+        log.info("Destroying all games");
         GameStorage.getInstance().removeAllGames();
     }
 }

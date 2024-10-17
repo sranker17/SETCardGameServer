@@ -4,8 +4,7 @@ import com.setcardgameserver.exception.InvalidUsernameException;
 import com.setcardgameserver.model.Role;
 import com.setcardgameserver.model.RoleEnum;
 import com.setcardgameserver.model.User;
-import com.setcardgameserver.model.dto.LoginUserDto;
-import com.setcardgameserver.model.dto.RegisterUserDto;
+import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -24,7 +23,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public User signup(RegisterUserDto input) {
+    public User signup(AuthUserDto input) {
         log.info("Creating user: {}", input.getUsername());
 
         if (userRepository.existsByUsername(input.getUsername())) {
@@ -43,7 +42,7 @@ public class AuthenticationService {
         return userRepository.save(user);
     }
 
-    public User authenticate(LoginUserDto input) {
+    public User authenticate(AuthUserDto input) {
         log.info("Authenticating user: {}", input.getUsername());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

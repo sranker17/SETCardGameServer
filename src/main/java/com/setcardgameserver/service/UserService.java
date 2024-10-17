@@ -4,7 +4,7 @@ import com.setcardgameserver.mapper.UserMapper;
 import com.setcardgameserver.model.Role;
 import com.setcardgameserver.model.RoleEnum;
 import com.setcardgameserver.model.User;
-import com.setcardgameserver.model.dto.RegisterUserDto;
+import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.model.dto.UserDto;
 import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
@@ -44,7 +44,7 @@ public class UserService {
         return userMapper.entityToDto(getLoggedInUser());
     }
 
-    public User createAdministrator(RegisterUserDto input) {
+    public User createAdministrator(AuthUserDto input) {
         log.info("Creating administrator: {}", input.getUsername());
         Role optionalRole = roleRepository.findByName(RoleEnum.ADMIN)
                 .orElseThrow();

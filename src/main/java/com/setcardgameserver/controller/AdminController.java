@@ -1,8 +1,9 @@
 package com.setcardgameserver.controller;
 
 import com.setcardgameserver.model.User;
-import com.setcardgameserver.model.dto.RegisterUserDto;
+import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +18,7 @@ public class AdminController {
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public User createAdministrator(@RequestBody RegisterUserDto registerUserDto) {
-        return userService.createAdministrator(registerUserDto);
+    public User createAdministrator(@Valid @RequestBody AuthUserDto authUserDto) {
+        return userService.createAdministrator(authUserDto);
     }
 }

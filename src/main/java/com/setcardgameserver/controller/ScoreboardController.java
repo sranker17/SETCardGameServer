@@ -3,6 +3,7 @@ package com.setcardgameserver.controller;
 import com.setcardgameserver.model.dto.ScoreboardDto;
 import com.setcardgameserver.model.dto.TopScores;
 import com.setcardgameserver.service.ScoreboardService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +27,7 @@ public class ScoreboardController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ScoreboardDto addScore(@RequestBody ScoreboardDto score) {
+    public ScoreboardDto addScore(@Valid @RequestBody ScoreboardDto score) {
         return scoreboardService.addScore(score);
     }
 
@@ -40,21 +41,21 @@ public class ScoreboardController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
-    public List<ScoreboardDto> ownScores() {
-        return scoreboardService.findOwnUserScores();
+    public TopScores getOwnUserScores() {
+        return scoreboardService.getOwnUserScores();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/user/{username}")
     @ResponseStatus(HttpStatus.OK)
-    public List<ScoreboardDto> userScores(@PathVariable("username") String username) {
-        return scoreboardService.findUserScores(username);
+    public TopScores getUserScores(@PathVariable("username") String username) {
+        return scoreboardService.getUserScores(username);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/top")
     @ResponseStatus(HttpStatus.OK)
-    public TopScores topScores() {
-        return scoreboardService.findTopScores();
+    public TopScores getTopScores() {
+        return scoreboardService.getTopScores();
     }
 }

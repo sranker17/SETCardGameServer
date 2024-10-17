@@ -40,12 +40,17 @@ public class ScoreboardService {
         }
     }
 
-    public List<ScoreboardDto> findUserScores(String username) {
-        log.info("Getting scores for user: {}", username);
-        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUsernameOrderByDifficultyDescScoreDescTimeAsc(username));
+    public TopScores getUserScores(String username) {
+        log.info("Getting top scores for user: {}", username);
+        TopScores topUserScores = new TopScores();
+        topUserScores.setEasyScores(scoreboardMapper.entityListToDto(
+                scoreboardRepository.findTop100ByUsernameAndDifficultyOrderByScoreDescTimeAsc(username, Difficulty.EASY.toString())));
+        topUserScores.setNormalScores(scoreboardMapper.entityListToDto(
+                scoreboardRepository.findTop100ByUsernameAndDifficultyOrderByScoreDescTimeAsc(username, Difficulty.NORMAL.toString())));
+        return topUserScores;
     }
 
-    public TopScores findTopScores() {
+    public TopScores getTopScores() {
         log.info("Getting top scores");
         TopScores topScores = new TopScores();
         topScores.setEasyScores(scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.EASY.toString())));
@@ -54,13 +59,13 @@ public class ScoreboardService {
     }
 
     public void clearScoreboard() {
-        log.info("Clearing scoreboard");
+        log.warn("Clearing scoreboard");
         scoreboardRepository.deleteAll();
     }
 
-    public List<ScoreboardDto> findOwnUserScores() {
+    public TopScores getOwnUserScores() {
         User user = userService.getLoggedInUser();
-        log.info("Getting own user scores: {}", user.getUsername());
-        return findUserScores(user.getUsername());
+        log.info("Getting top user scores for self: {}", user.getUsername());
+        return getUserScores(user.getUsername());
     }
 }

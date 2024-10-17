@@ -3,7 +3,7 @@ package com.setcardgameserver.bootstrap;
 import com.setcardgameserver.model.Role;
 import com.setcardgameserver.model.RoleEnum;
 import com.setcardgameserver.model.User;
-import com.setcardgameserver.model.dto.RegisterUserDto;
+import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -54,7 +54,7 @@ public class DBSeeder implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void createSuperAdministrator() {
-        RegisterUserDto userDto = new RegisterUserDto();
+        AuthUserDto userDto = new AuthUserDto();
         //TODO: Change the default super admin credentials
         userDto.setUsername("super_admin").setPassword("123456");
 

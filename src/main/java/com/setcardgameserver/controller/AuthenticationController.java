@@ -1,11 +1,11 @@
 package com.setcardgameserver.controller;
 
 import com.setcardgameserver.model.User;
+import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.model.dto.LoginResponse;
-import com.setcardgameserver.model.dto.LoginUserDto;
-import com.setcardgameserver.model.dto.RegisterUserDto;
 import com.setcardgameserver.service.AuthenticationService;
 import com.setcardgameserver.service.JwtService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +20,13 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register(@RequestBody RegisterUserDto registerUserDto) {
-        return authenticationService.signup(registerUserDto);
+    public User register(@Valid @RequestBody AuthUserDto authUserDto) {
+        return authenticationService.signup(authUserDto);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public LoginResponse authenticate(@RequestBody LoginUserDto loginUserDto) {
+    public LoginResponse authenticate(@Valid @RequestBody AuthUserDto loginUserDto) {
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
         return new LoginResponse().setToken(jwtToken).setExpiresIn(jwtService.getExpirationTime());

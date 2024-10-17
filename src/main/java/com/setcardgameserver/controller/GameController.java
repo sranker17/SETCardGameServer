@@ -2,7 +2,7 @@ package com.setcardgameserver.controller;
 
 import com.setcardgameserver.model.dto.*;
 import com.setcardgameserver.exception.InvalidGameException;
-import com.setcardgameserver.exception.NotFoundException;
+import com.setcardgameserver.exception.GameNotFoundException;
 import com.setcardgameserver.mapper.GameMapper;
 import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.createGame(UUID.fromString(usernameDto.getUsername())));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -56,7 +56,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(UUID.fromString(usernameDto.getUsername())));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
 
@@ -71,7 +71,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.getGameById(gameIdDto.getGameId()));
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameIdDto.getGameId(), gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
 
@@ -86,7 +86,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.gameplay(gameplayDto));
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
-        } catch (InvalidGameException | NotFoundException e) {
+        } catch (InvalidGameException | GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -102,7 +102,7 @@ public class GameController {
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
         } catch (InvalidGameException e) {
             log.error(e.getMessage());
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -114,7 +114,7 @@ public class GameController {
 
         try {
             gameService.removeGame(gameIdDto.getGameId());
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");

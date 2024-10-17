@@ -1,12 +1,9 @@
 package com.setcardgameserver.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Table
@@ -15,14 +12,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Scoreboard {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID", nullable = false)
-    private Long id;
-
-    @Column(name = "UserID", nullable = false)
-    private UUID userId;
+public class Scoreboard extends BaseEntity {
+    @Column(name = "Username", nullable = false)
+    private String username;
 
     @Column(name = "Difficulty", nullable = false)
     private String difficulty;
@@ -32,12 +24,4 @@ public class Scoreboard {
 
     @Column(name = "Time", nullable = false)
     private int time;
-
-    @CreationTimestamp
-    @Column(updatable = false, name = "CreatedAt")
-    private Date createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UpdatedAt")
-    private Date updatedAt;
 }

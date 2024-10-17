@@ -72,6 +72,14 @@ public class GlobalExceptionHandler {
         return errorDetail;
     }
 
+    @ExceptionHandler(InvalidScoreException.class)
+    public ProblemDetail handleInvalidScoreException(InvalidScoreException exception) {
+        log.error("InvalidScoreException occurred {}", exception.getMessage());
+        ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), exception.getMessage());
+        errorDetail.setProperty(DESCRIPTION, "Invalid score");
+        return errorDetail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {
         log.error("An exception occurred {}", exception.getMessage());

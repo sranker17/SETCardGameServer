@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ScoreboardRepository extends JpaRepository<Scoreboard, Long> {
 
-    List<Scoreboard> findByUserIdOrderByDifficultyDescScoreDescTimeAsc(UUID userId);
+    List<Scoreboard> findByUsernameOrderByDifficultyDescScoreDescTimeAsc(String username);
 
     List<Scoreboard> findTop100ByDifficultyOrderByScoreDescTimeAsc(String difficulty);
 }

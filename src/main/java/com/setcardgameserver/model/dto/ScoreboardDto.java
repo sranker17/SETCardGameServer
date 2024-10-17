@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Data
 public class ScoreboardDto {
-    private UUID userId;
+    private String username;
     private String difficulty;
     private int score;
     private int time;

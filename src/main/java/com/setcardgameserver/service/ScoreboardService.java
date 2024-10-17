@@ -1,5 +1,6 @@
 package com.setcardgameserver.service;
 
+import com.setcardgameserver.exception.InvalidScoreException;
 import com.setcardgameserver.mapper.ScoreboardMapper;
 import com.setcardgameserver.model.Difficulty;
 import com.setcardgameserver.model.Scoreboard;
@@ -27,20 +28,21 @@ public class ScoreboardService {
     }
 
     public ScoreboardDto addScore(ScoreboardDto newScore) {
+        userService.validateUser(newScore.getUsername());
         if (newScore.getScore() > 0 && newScore.getScore() < 10 && newScore.getTime() > 0
                 && (newScore.getDifficulty().equals(Difficulty.EASY.toString()) || newScore.getDifficulty().equals(Difficulty.NORMAL.toString()))) {
             log.info("Adding score to scoreboard: {}", newScore);
-            Scoreboard saved = scoreboardRepository.save(scoreboardMapper.dtoToEntity(newScore));
+            Scoreboard score = scoreboardMapper.dtoToEntity(newScore);
+            Scoreboard saved = scoreboardRepository.save(score);
             return scoreboardMapper.entityToDto(saved);
         } else {
-            throw new IllegalArgumentException("Invalid score");
+            throw new InvalidScoreException("The score or the difficulty is invalid");
         }
     }
 
     public List<ScoreboardDto> findUserScores(String username) {
         log.info("Getting scores for user: {}", username);
-        User user = userService.findByUsername(username);
-        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUserIdOrderByDifficultyDescScoreDescTimeAsc(user.getId()));
+        return scoreboardMapper.entityListToDto(scoreboardRepository.findByUsernameOrderByDifficultyDescScoreDescTimeAsc(username));
     }
 
     public TopScores findTopScores() {

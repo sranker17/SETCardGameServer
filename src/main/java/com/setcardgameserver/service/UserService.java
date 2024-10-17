@@ -10,6 +10,7 @@ import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,5 +60,11 @@ public class UserService {
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
+    }
+
+    public void validateUser(String username) {
+        log.info("Validating user: {}", username);
+        if (!getLoggedInUser().getUsername().equals(username))
+            throw new AccessDeniedException("User is not authorized to perform this action");
     }
 }

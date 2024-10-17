@@ -1,5 +1,6 @@
 package com.setcardgameserver.service;
 
+import com.setcardgameserver.exception.InvalidUsernameException;
 import com.setcardgameserver.model.Role;
 import com.setcardgameserver.model.RoleEnum;
 import com.setcardgameserver.model.User;
@@ -25,6 +26,12 @@ public class AuthenticationService {
 
     public User signup(RegisterUserDto input) {
         log.info("Creating user: {}", input.getUsername());
+
+        if (userRepository.existsByUsername(input.getUsername())) {
+            log.debug("Username is already taken {}", input.getUsername());
+            throw new InvalidUsernameException("Username is already taken");
+        }
+
         Role optionalRole = roleRepository.findByName(RoleEnum.USER)
                 .orElseThrow();
 

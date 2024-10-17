@@ -1,18 +1,20 @@
 package com.setcardgameserver.storage;
 
 import com.setcardgameserver.model.Game;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Stores all ongoing multiplayer games
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GameStorage {
 
-    private static Map<Integer, Game> games;
+    private static final Map<Integer, Game> games = new HashMap<>();
     private static GameStorage instance;
-
-    private GameStorage() {
-        games = new HashMap<>();
-    }
 
     public static synchronized GameStorage getInstance() {
         if (instance == null) {

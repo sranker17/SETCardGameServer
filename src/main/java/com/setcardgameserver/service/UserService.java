@@ -40,10 +40,7 @@ public class UserService {
 
     public UserDto getOwnUser() {
         log.info("Finding own user");
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-
-        return userMapper.entityToDto(currentUser);
+        return userMapper.entityToDto(getLoggedInUser());
     }
 
     public User createAdministrator(RegisterUserDto input) {
@@ -57,5 +54,10 @@ public class UserService {
                 .setRole(optionalRole);
 
         return userRepository.save(user);
+    }
+
+    public User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }

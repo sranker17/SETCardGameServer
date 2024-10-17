@@ -12,6 +12,5 @@ public interface ScoreboardRepository extends JpaRepository<Scoreboard, Long> {
 
     List<Scoreboard> findByUserIdOrderByDifficultyDescScoreDescTimeAsc(UUID userId);
 
-    //TODO create separate for top 100s for each difficulty
-    List<Scoreboard> findByOrderByDifficultyDescScoreDescTimeAsc();
+    List<Scoreboard> findTop100ByDifficultyOrderByScoreDescTimeAsc(String difficulty);
 }

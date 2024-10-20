@@ -53,8 +53,13 @@ public class ScoreboardService {
     public TopScores getTopScores() {
         log.info("Getting top scores");
         TopScores topScores = new TopScores();
-        topScores.setEasyScores(scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.EASY.toString())));
-        topScores.setNormalScores(scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.NORMAL.toString())));
+        List<ScoreboardDto> topEasies = scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.EASY.toString()));
+        List<ScoreboardDto> topNormals = scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.NORMAL.toString()));
+        String username = userService.getLoggedInUser().getUsername();
+        topEasies.forEach(scoreboardDto -> scoreboardDto.setUserScore(scoreboardDto.getUsername().equals(username)));
+        topScores.setEasyScores(topEasies);
+        topNormals.forEach(scoreboardDto -> scoreboardDto.setUserScore(scoreboardDto.getUsername().equals(username)));
+        topScores.setNormalScores(topNormals);
         return topScores;
     }
 

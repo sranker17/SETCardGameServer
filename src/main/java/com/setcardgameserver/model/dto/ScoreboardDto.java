@@ -1,6 +1,7 @@
 package com.setcardgameserver.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -9,8 +10,8 @@ public class ScoreboardDto {
     private String username;
     @NotBlank(message = "The difficulty is required")
     private String difficulty;
-    @NotBlank(message = "The score is required")
+    @NotNull(message = "The score is required")
     private int score;
-    @NotBlank(message = "The time is required")
+    @NotNull(message = "The time is required")
     private int time;
 }

@@ -98,6 +98,14 @@ public class GlobalExceptionHandler {
         return errorDetail;
     }
 
+    @ExceptionHandler(InvalidUsernameException.class)
+    public ProblemDetail handleInvalidUsernameException(InvalidUsernameException exception) {
+        log.error("InvalidUsernameException occurred {}", exception.getMessage());
+        ProblemDetail errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(409), exception.getMessage());
+        errorDetail.setProperty(DESCRIPTION, "Username is already taken");
+        return errorDetail;
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleSecurityException(Exception exception) {
         log.error("An exception occurred {}", exception.getMessage());

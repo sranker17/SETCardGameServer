@@ -6,6 +6,7 @@ import com.setcardgameserver.model.dto.LoginResponse;
 import com.setcardgameserver.model.dto.UserDto;
 import com.setcardgameserver.service.AuthenticationService;
 import com.setcardgameserver.service.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,14 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
+    @Operation(summary = "Signup new user", description = "Signup new user, no authentication needed")
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto register(@Valid @RequestBody AuthUserDto authUserDto) {
         return authenticationService.signup(authUserDto);
     }
 
+    @Operation(summary = "Login user", description = "Login user, no authentication needed")
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public LoginResponse authenticate(@Valid @RequestBody AuthUserDto loginUserDto) {

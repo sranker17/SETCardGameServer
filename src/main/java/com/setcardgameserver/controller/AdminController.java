@@ -3,6 +3,7 @@ package com.setcardgameserver.controller;
 import com.setcardgameserver.model.User;
 import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     private final UserService userService;
 
+    @Hidden
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)

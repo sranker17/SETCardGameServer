@@ -3,6 +3,8 @@ package com.setcardgameserver.controller;
 import com.setcardgameserver.model.dto.ScoreboardDto;
 import com.setcardgameserver.model.dto.TopScores;
 import com.setcardgameserver.service.ScoreboardService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.List;
 public class ScoreboardController {
     private final ScoreboardService scoreboardService;
 
+    @Hidden
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -24,6 +27,7 @@ public class ScoreboardController {
         return scoreboardService.scoreboard();
     }
 
+    @Operation(summary = "Add new score", description = "Add new score to the scoreboard, needs authentication")
     @PreAuthorize("isAuthenticated()")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -31,6 +35,7 @@ public class ScoreboardController {
         return scoreboardService.addScore(score);
     }
 
+    @Hidden
     @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,6 +43,7 @@ public class ScoreboardController {
         scoreboardService.clearScoreboard();
     }
 
+    @Operation(summary = "Get own top scores", description = "Get logged in user's top scores, needs authentication")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/user")
     @ResponseStatus(HttpStatus.OK)
@@ -45,6 +51,7 @@ public class ScoreboardController {
         return scoreboardService.getOwnUserScores();
     }
 
+    @Hidden
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/user/{username}")
     @ResponseStatus(HttpStatus.OK)
@@ -52,6 +59,7 @@ public class ScoreboardController {
         return scoreboardService.getUserScores(username);
     }
 
+    @Operation(summary = "Get top scores", description = "Get top scores, needs authentication")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/top")
     @ResponseStatus(HttpStatus.OK)

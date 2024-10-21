@@ -6,6 +6,6 @@ import java.util.List;
 
 @Data
 public class TopScores {
-    private List<ScoreboardDto> easyScores;
-    private List<ScoreboardDto> normalScores;
+    private List<ScoreboardWithUserScoreDto> easyScores;
+    private List<ScoreboardWithUserScoreDto> normalScores;
 }

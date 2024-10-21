@@ -2,6 +2,8 @@ package com.setcardgameserver.controller;
 
 import com.setcardgameserver.model.dto.UserDto;
 import com.setcardgameserver.service.UserService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,14 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
+    @Operation(summary = "Get logged in user", description = "Get logged in user, needs authentication")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
     public ResponseEntity<UserDto> authenticatedUser() {
         return ResponseEntity.ok(userService.getOwnUser());
     }
 
+    @Hidden
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)

@@ -14,5 +14,4 @@ public class ScoreboardDto {
     private int score;
     @NotNull(message = "The time is required")
     private int time;
-    private boolean userScore;
 }

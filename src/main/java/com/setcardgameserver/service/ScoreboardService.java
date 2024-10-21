@@ -6,6 +6,7 @@ import com.setcardgameserver.model.Difficulty;
 import com.setcardgameserver.model.Scoreboard;
 import com.setcardgameserver.model.User;
 import com.setcardgameserver.model.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.ScoreboardWithUserScoreDto;
 import com.setcardgameserver.model.dto.TopScores;
 import com.setcardgameserver.repository.ScoreboardRepository;
 import lombok.AllArgsConstructor;
@@ -24,13 +25,13 @@ public class ScoreboardService {
 
     public List<ScoreboardDto> scoreboard() {
         log.info("Getting scoreboard");
-        return scoreboardMapper.entityListToDto(scoreboardRepository.findAll());
+        return scoreboardMapper.entityListToDtoList(scoreboardRepository.findAll());
     }
 
     public ScoreboardDto addScore(ScoreboardDto newScore) {
         userService.validateUser(newScore.getUsername());
         if (newScore.getScore() > 0 && newScore.getScore() < 10 && newScore.getTime() > 0
-                && (newScore.getDifficulty().equals(Difficulty.EASY.toString()) || newScore.getDifficulty().equals(Difficulty.NORMAL.toString()))) {
+            && (newScore.getDifficulty().equals(Difficulty.EASY.toString()) || newScore.getDifficulty().equals(Difficulty.NORMAL.toString()))) {
             log.info("Adding score to scoreboard: {}", newScore);
             Scoreboard score = scoreboardMapper.dtoToEntity(newScore);
             Scoreboard saved = scoreboardRepository.save(score);
@@ -43,9 +44,9 @@ public class ScoreboardService {
     public TopScores getUserScores(String username) {
         log.info("Getting top scores for user: {}", username);
         TopScores topUserScores = new TopScores();
-        topUserScores.setEasyScores(scoreboardMapper.entityListToDto(
+        topUserScores.setEasyScores(scoreboardMapper.entityListToTopDtoList(
                 scoreboardRepository.findTop100ByUsernameAndDifficultyOrderByScoreDescTimeAsc(username, Difficulty.EASY.toString())));
-        topUserScores.setNormalScores(scoreboardMapper.entityListToDto(
+        topUserScores.setNormalScores(scoreboardMapper.entityListToTopDtoList(
                 scoreboardRepository.findTop100ByUsernameAndDifficultyOrderByScoreDescTimeAsc(username, Difficulty.NORMAL.toString())));
         return topUserScores;
     }
@@ -53,8 +54,10 @@ public class ScoreboardService {
     public TopScores getTopScores() {
         log.info("Getting top scores");
         TopScores topScores = new TopScores();
-        List<ScoreboardDto> topEasies = scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.EASY.toString()));
-        List<ScoreboardDto> topNormals = scoreboardMapper.entityListToDto(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.NORMAL.toString()));
+        List<ScoreboardWithUserScoreDto> topEasies =
+                scoreboardMapper.entityListToTopDtoList(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.EASY.toString()));
+        List<ScoreboardWithUserScoreDto> topNormals =
+                scoreboardMapper.entityListToTopDtoList(scoreboardRepository.findTop100ByDifficultyOrderByScoreDescTimeAsc(Difficulty.NORMAL.toString()));
         String username = userService.getLoggedInUser().getUsername();
         topEasies.forEach(scoreboardDto -> scoreboardDto.setUserScore(scoreboardDto.getUsername().equals(username)));
         topScores.setEasyScores(topEasies);

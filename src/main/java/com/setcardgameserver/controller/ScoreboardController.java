@@ -1,52 +1,69 @@
 package com.setcardgameserver.controller;
 
-import com.setcardgameserver.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.TopScores;
 import com.setcardgameserver.service.ScoreboardService;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
-
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
+@RequestMapping("/scoreboard")
 @AllArgsConstructor
 public class ScoreboardController {
     private final ScoreboardService scoreboardService;
 
-    @GetMapping("/scoreboard")
-    public ResponseEntity<List<ScoreboardDto>> scoreboard() {
-        return status(HttpStatus.OK).body(scoreboardService.scoreboard());
+    @Hidden
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<ScoreboardDto> scoreboard() {
+        return scoreboardService.scoreboard();
     }
 
-    @PostMapping("/scoreboard")
-    public ResponseEntity<ScoreboardDto> addScore(@RequestBody ScoreboardDto score) {
-        if (score.getScore() > 0 && score.getScore() < 10 && score.getTime() > 0 && (score.getDifficulty().equals("Easy") || score.getDifficulty().equals("Normal"))) {
-            return status(HttpStatus.CREATED).body(scoreboardService.addScore(score));
-        }
-        return status(HttpStatus.BAD_REQUEST).body(null);
+    @Operation(summary = "Add new score", description = "Add new score to the scoreboard, needs authentication")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ScoreboardDto addScore(@Valid @RequestBody ScoreboardDto score) {
+        return scoreboardService.addScore(score);
     }
 
-    @DeleteMapping("/scoreboard")
+    @Hidden
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN')")
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
     public void clearScoreboard() {
         scoreboardService.clearScoreboard();
     }
 
-    @GetMapping("/available")
-    public ResponseEntity<String> available() {
-        return status(HttpStatus.OK).body("available");
+    @Operation(summary = "Get own top scores", description = "Get logged in user's top scores, needs authentication")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/user")
+    @ResponseStatus(HttpStatus.OK)
+    public TopScores getOwnUserScores() {
+        return scoreboardService.getOwnUserScores();
     }
 
-    @GetMapping("/scoreboard/player/{id}")
-    public ResponseEntity<List<ScoreboardDto>> playerScores(@PathVariable("id") UUID playerId) {
-        return status(HttpStatus.OK).body(scoreboardService.findPlayerScores(playerId));
+    @Hidden
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @GetMapping("/user/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public TopScores getUserScores(@PathVariable("username") String username) {
+        return scoreboardService.getUserScores(username);
     }
 
-    @GetMapping("/scoreboard/top")
-    public ResponseEntity<List<ScoreboardDto>> topScores() {
-        return status(HttpStatus.OK).body(scoreboardService.findTopScores());
+    @Operation(summary = "Get top scores", description = "Get top scores, needs authentication")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/top")
+    @ResponseStatus(HttpStatus.OK)
+    public TopScores getTopScores() {
+        return scoreboardService.getTopScores();
     }
 }

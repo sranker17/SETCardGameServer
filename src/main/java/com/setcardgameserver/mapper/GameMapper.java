@@ -1,6 +1,6 @@
 package com.setcardgameserver.mapper;
 
-import com.setcardgameserver.dto.GameDto;
+import com.setcardgameserver.model.dto.GameDto;
 import com.setcardgameserver.model.Game;
 import org.mapstruct.Mapper;
 

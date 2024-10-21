@@ -1,9 +1,9 @@
 package com.setcardgameserver.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
-
-import java.util.UUID;
 
 @Entity
 @Table
@@ -12,17 +12,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Scoreboard {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "SCORE_ID")
-    private Long scoreId;
-    @Column(name = "PLAYER_ID")
-    private UUID playerId;
-    @Column(name = "DIFFICULTY")
+public class Scoreboard extends BaseEntity {
+    @Column(name = "Username", nullable = false)
+    private String username;
+
+    @Column(name = "Difficulty", nullable = false)
     private String difficulty;
-    @Column(name = "SCORE")
+
+    @Column(name = "Score", nullable = false)
     private int score;
-    @Column(name = "TIME")
+
+    @Column(name = "Time", nullable = false)
     private int time;
 }

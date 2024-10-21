@@ -1,4 +1,4 @@
-package com.setcardgameserver.dto;
+package com.setcardgameserver.model.dto;
 
 import lombok.Data;
 

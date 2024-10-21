@@ -1,8 +1,8 @@
 package com.setcardgameserver.controller;
 
-import com.setcardgameserver.dto.*;
+import com.setcardgameserver.model.dto.*;
 import com.setcardgameserver.exception.InvalidGameException;
-import com.setcardgameserver.exception.NotFoundException;
+import com.setcardgameserver.exception.GameNotFoundException;
 import com.setcardgameserver.mapper.GameMapper;
 import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Slf4j
 public class GameController {
-
     private final GameService gameService;
     private final GameMapper gameMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -27,14 +26,14 @@ public class GameController {
     private static final String TOPIC_DESTROYED = "/topic/destroyed/";
 
     @MessageMapping("/create")
-    public GameDto create(@RequestBody PlayerDto playerDto) {
-        log.debug("create private game request: {}", playerDto.getUsername());
+    public GameDto create(@RequestBody UsernameDto usernameDto) {
+        log.debug("create private game request: {}", usernameDto.getUsername());
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.createGame(UUID.fromString(playerDto.getUsername())));
+            gameDto = gameMapper.entityToDto(gameService.createGame(UUID.fromString(usernameDto.getUsername())));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -50,14 +49,14 @@ public class GameController {
     }
 
     @MessageMapping("/connect/random")
-    public GameDto connectRandom(@RequestBody PlayerDto playerDto) {
-        log.debug("connect random {}", playerDto.getUsername());
+    public GameDto connectRandom(@RequestBody UsernameDto usernameDto) {
+        log.debug("connect random {}", usernameDto.getUsername());
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(UUID.fromString(playerDto.getUsername())));
+            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(UUID.fromString(usernameDto.getUsername())));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
 
@@ -72,7 +71,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.getGameById(gameIdDto.getGameId()));
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameIdDto.getGameId(), gameDto);
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
 
@@ -87,7 +86,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.gameplay(gameplayDto));
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
-        } catch (InvalidGameException | NotFoundException e) {
+        } catch (InvalidGameException | GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -103,7 +102,7 @@ public class GameController {
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
         } catch (InvalidGameException e) {
             log.error(e.getMessage());
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -115,7 +114,7 @@ public class GameController {
 
         try {
             gameService.removeGame(gameIdDto.getGameId());
-        } catch (NotFoundException e) {
+        } catch (GameNotFoundException e) {
             log.error(e.getMessage());
         }
         simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");
@@ -123,8 +122,8 @@ public class GameController {
     }
 
     @MessageMapping("/game/destroy/all")
-    public void destroyAllGames(@RequestBody PlayerDto playerDto) {
-        log.debug("destroy all games by {}", playerDto.getUsername());
+    public void destroyAllGames(@RequestBody UsernameDto usernameDto) {
+        log.debug("destroy all games by {}", usernameDto.getUsername());
 
         gameService.destroyAllGames();
     }

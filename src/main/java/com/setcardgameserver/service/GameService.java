@@ -1,7 +1,7 @@
 package com.setcardgameserver.service;
 
-import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.exception.GameNotFoundException;
+import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.model.Game;
 import com.setcardgameserver.model.GameStatus;
 import com.setcardgameserver.model.dto.GameplayButtonPress;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -21,14 +20,18 @@ import java.util.UUID;
 public class GameService {
     private static final Random random = new Random();
 
-    public Game createGame(UUID player) throws GameNotFoundException {
+    public Game createGame(String player) throws GameNotFoundException {
         log.info("Creating game for player: {}", player);
-        Optional<Game> hasGame = GameStorage.getInstance().getGames().values().stream()
+        Optional<Game> hasGame = GameStorage.getInstance()
+                .getGames()
+                .values().stream()
                 .filter(it -> it.getPlayer1().equals(player))
                 .findFirst();
 
         if (hasGame.isPresent()) {
-            Game game = GameStorage.getInstance().getGames().values().stream()
+            Game game = GameStorage.getInstance()
+                    .getGames()
+                    .values().stream()
                     .filter(it -> it.getPlayer1().equals(player))
                     .findFirst().orElseThrow(() -> new GameNotFoundException("Game not found while creating game"));
             removeGame(game.getGameId());
@@ -51,7 +54,7 @@ public class GameService {
         return game;
     }
 
-    public Game connectToGame(UUID player2, int gameId) {
+    public Game connectToGame(String player2, int gameId) {
         log.info("Connecting player to game: {}", player2);
         if (!GameStorage.getInstance().getGames().containsKey(gameId)) {
             return new Game();
@@ -70,7 +73,7 @@ public class GameService {
         return game;
     }
 
-    public Game connectToRandomGame(UUID player2) throws GameNotFoundException {
+    public Game connectToRandomGame(String player2) throws GameNotFoundException {
         log.info("Connecting player to random game: {}", player2);
         Game game;
         Optional<Game> hasGame = GameStorage.getInstance().getGames().values().stream()
@@ -85,14 +88,14 @@ public class GameService {
                     .filter(it -> it.getStatus().equals(GameStatus.NEW))
                     .findFirst().orElseThrow(() -> new GameNotFoundException("Game not found while connecting to random game"));
 
-            if (game.getPlayer1().toString().equals(player2.toString())) {
+            if (game.getPlayer1().equals(player2)) {
                 removeGame(game.getGameId());
                 game = createNewRandomGame(player2);
                 log.debug("same game");
                 return game;
             }
 
-            if (game.getPlayer2() != null && game.getPlayer2().toString().equals(player2.toString())) {
+            if (game.getPlayer2() != null && game.getPlayer2().equals(player2)) {
                 GameStorage.getInstance().removeGame(game);
                 game = createNewRandomGame(player2);
                 log.debug("left game");
@@ -108,7 +111,7 @@ public class GameService {
         return game;
     }
 
-    public Game createNewRandomGame(UUID player) {
+    public Game createNewRandomGame(String player) {
         log.info("Creating new random game for player: {}", player);
         Game newGame = new Game();
         newGame.createGame();
@@ -135,14 +138,14 @@ public class GameService {
             throw new InvalidGameException("Game is already finished");
         }
 
-        if (game.getBlockedBy() != null && game.getBlockedBy().toString().equals(buttonPress.getPlayerId().toString())) {
+        if (game.getBlockedBy() != null && game.getBlockedBy().equals(buttonPress.getPlayerId())) {
             log.debug("same player pressed the button");
             game.setBlockedBy(null);
             game.clearSelectedCardIndexes();
             return game;
         }
 
-        if (game.getBlockedBy() != null && !game.getBlockedBy().toString().equals(buttonPress.getPlayerId().toString())) {
+        if (game.getBlockedBy() != null && !game.getBlockedBy().equals(buttonPress.getPlayerId())) {
             log.debug("Both players pressed the button almost at the same time");
             return game;
         }

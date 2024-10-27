@@ -10,22 +10,21 @@ import java.util.*;
 @Slf4j
 @NoArgsConstructor
 public class Game {
-
     private static final int BOARD_SIZE = 9;
     private int gameId;
-    private UUID player1;
-    private UUID player2;
+    private String player1;
+    private String player2;
     private GameStatus status;
     private ArrayList<Card> board = new ArrayList<>();
-    private UUID winner;
+    private String winner;
     private ArrayList<Card> cardDeck = new ArrayList<>();
-    private UUID blockedBy;
+    private String blockedBy;
     private ArrayList<Integer> selectedCardIndexes = new ArrayList<>();
-    private Map<UUID, Integer> points = new HashMap<>();
+    private Map<String, Integer> points = new HashMap<>();
     private ArrayList<Integer> nullCardIndexes = new ArrayList<>();
     private boolean playerLeft = false;
 
-    public Game(int gameId, UUID winner, boolean playerLeft) {
+    public Game(int gameId, String winner, boolean playerLeft) {
         this.gameId = gameId;
         this.winner = winner;
         this.playerLeft = playerLeft;
@@ -137,14 +136,14 @@ public class Game {
         }
     }
 
-    public UUID calculateWinner() {
+    public String calculateWinner() {
         if (player1 != null && player2 != null) {
             if (points.get(player1) > points.get(player2)) {
                 return player1;
             } else if (points.get(player1) < points.get(player2)) {
                 return player2;
             } else if (Objects.equals(points.get(player1), points.get(player2))) {
-                return UUID.randomUUID();
+                return "";
             }
         }
         return null;

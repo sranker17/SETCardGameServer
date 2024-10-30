@@ -1,9 +1,9 @@
 package com.setcardgameserver.controller;
 
-import com.setcardgameserver.model.dto.*;
-import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.exception.GameNotFoundException;
+import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.mapper.GameMapper;
+import com.setcardgameserver.model.dto.*;
 import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +11,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.UUID;
 
 @Controller
 @AllArgsConstructor
@@ -31,7 +29,7 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.createGame(UUID.fromString(usernameDto.getUsername())));
+            gameDto = gameMapper.entityToDto(gameService.createGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         } catch (GameNotFoundException e) {
             log.error(e.getMessage());
@@ -54,7 +52,7 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(UUID.fromString(usernameDto.getUsername())));
+            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         } catch (GameNotFoundException e) {
             log.error(e.getMessage());

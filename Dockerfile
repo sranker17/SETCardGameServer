@@ -1,13 +1,22 @@
-# Build the application first using Maven
-FROM maven:3.8.3-openjdk-17 AS build
+FROM maven:3.8.3-openjdk-17-slim AS build
 WORKDIR /app
-COPY . .
-RUN mvn install
 
-# Inject the JAR file into a new container to keep the file small
-FROM openjdk:17
+# Copy only the necessary files to reduce the context size
+COPY pom.xml .
+COPY src ./src
+
+# Build the application
+RUN mvn clean install -DskipTests
+
+# Use a minimal base image for the runtime
+FROM openjdk:17-jdk-slim
 WORKDIR /app
+
+# Copy the built JAR file from the build stage
 COPY --from=build /app/target/set-card-game-server.jar /app/app.jar
+
+# Expose the application port
 EXPOSE 8080
-ENTRYPOINT ["sh", "-c"]
-CMD ["java -jar app.jar"]
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

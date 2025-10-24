@@ -7,6 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -18,47 +20,55 @@ public class RedisGameService {
 
     private static final String GAME_PREFIX = "game:";
     private static final String ACTIVE_GAMES_KEY = "active_games";
-    private static final Duration GAME_EXPIRY = Duration.ofHours(2); // Games expire after 2 hours
+    private static final Duration GAME_EXPIRY = Duration.ofHours(1); // Games expire after 1 hour
 
     /**
-     * Store a multiplayer game in Redis
+     * Get all games
      */
-    public void storeGame(Game game) {
-        String gameKey = GAME_PREFIX + game.getGameId();
+    public Map<Integer, Game> getGames() {
+        Map<Integer, Game> games = new HashMap<>();
         try {
-            redisTemplate.opsForValue().set(gameKey, game, GAME_EXPIRY);
-            redisTemplate.opsForSet().add(ACTIVE_GAMES_KEY, game.getGameId());
-            log.info("Game {} stored in Redis", game.getGameId());
+            Set<Object> gameIds = redisTemplate.opsForSet().members(ACTIVE_GAMES_KEY);
+            if (gameIds != null) {
+                for (Object gameIdObj : gameIds) {
+                    Integer gameId = (Integer) gameIdObj;
+                    Game game = getGame(gameId);
+                    if (game != null) {
+                        games.put(gameId, game);
+                    }
+                }
+            }
         } catch (Exception e) {
-            log.error("Error storing game {} in Redis: {}", game.getGameId(), e.getMessage());
+            log.error("Error retrieving all games from Redis: {}", e.getMessage());
         }
+        return games;
     }
 
     /**
      * Retrieve a multiplayer game from Redis
      */
-    public Game getGame(String gameId) {
-        String gameKey = GAME_PREFIX + gameId;
+    public void setGame(Game game) {
+        String gameKey = GAME_PREFIX + game.getId();
         try {
-            Object game = redisTemplate.opsForValue().get(gameKey);
-            return (Game) game;
+            redisTemplate.opsForValue().set(gameKey, game, GAME_EXPIRY);
+            redisTemplate.opsForSet().add(ACTIVE_GAMES_KEY, game.getId());
+            log.info("Game {} stored in Redis", game.getId());
         } catch (Exception e) {
-            log.error("Error retrieving game {} from Redis: {}", gameId, e.getMessage());
+            log.error("Error storing game {} in Redis: {}", game.getId(), e.getMessage());
         }
-        return null;
     }
 
     /**
      * Update an existing game in Redis
      */
-    public void updateGame(Game game) {
-        storeGame(game); // Redis will overwrite the existing key
+    public void removeGame(Game game) {
+        removeGame(game.getId());
     }
 
     /**
-     * Remove a game from Redis
+     * Remove a game by ID
      */
-    public void removeGame(String gameId) {
+    public void removeGame(Integer gameId) {
         String gameKey = GAME_PREFIX + gameId;
         try {
             redisTemplate.delete(gameKey);
@@ -67,6 +77,40 @@ public class RedisGameService {
         } catch (Exception e) {
             log.error("Error removing game {} from Redis: {}", gameId, e.getMessage());
         }
+    }
+
+    /**
+     * Remove all games
+     */
+    public void removeAllGames() {
+        try {
+            Set<Object> gameIds = redisTemplate.opsForSet().members(ACTIVE_GAMES_KEY);
+            if (gameIds != null) {
+                for (Object gameIdObj : gameIds) {
+                    Integer gameId = (Integer) gameIdObj;
+                    String gameKey = GAME_PREFIX + gameId;
+                    redisTemplate.delete(gameKey);
+                }
+            }
+            redisTemplate.delete(ACTIVE_GAMES_KEY);
+            log.info("All games removed from Redis");
+        } catch (Exception e) {
+            log.error("Error removing all games from Redis: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieve a specific game by ID
+     */
+    public Game getGame(Integer gameId) {
+        String gameKey = GAME_PREFIX + gameId;
+        try {
+            Object game = redisTemplate.opsForValue().get(gameKey);
+            return (Game) game;
+        } catch (Exception e) {
+            log.error("Error retrieving game {} from Redis: {}", gameId, e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -82,9 +126,9 @@ public class RedisGameService {
     }
 
     /**
-     * Check if a game exists in Redis
+     * Check if a game exists
      */
-    public boolean gameExists(String gameId) {
+    public boolean gameExists(Integer gameId) {
         String gameKey = GAME_PREFIX + gameId;
         try {
             return redisTemplate.hasKey(gameKey);
@@ -97,7 +141,7 @@ public class RedisGameService {
     /**
      * Extend the expiry time for a game
      */
-    public void extendGameExpiry(String gameId) {
+    public void extendGameExpiry(Integer gameId) {
         String gameKey = GAME_PREFIX + gameId;
         try {
             redisTemplate.expire(gameKey, GAME_EXPIRY);

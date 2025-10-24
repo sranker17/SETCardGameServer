@@ -11,7 +11,7 @@ import java.util.*;
 @NoArgsConstructor
 public class Game {
     private static final int BOARD_SIZE = 9;
-    private int gameId;
+    private int id;
     private String player1;
     private String player2;
     private GameStatus status;
@@ -24,8 +24,8 @@ public class Game {
     private ArrayList<Integer> nullCardIndexes = new ArrayList<>();
     private boolean playerLeft = false;
 
-    public Game(int gameId, String winner, boolean playerLeft) {
-        this.gameId = gameId;
+    public Game(int id, String winner, boolean playerLeft) {
+        this.id = id;
         this.winner = winner;
         this.playerLeft = playerLeft;
     }

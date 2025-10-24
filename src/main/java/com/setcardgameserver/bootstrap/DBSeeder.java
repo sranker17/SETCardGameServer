@@ -8,6 +8,7 @@ import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +21,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @AllArgsConstructor
-public class DBSeeder implements ApplicationListener<ContextRefreshedEvent> {
+public class DBSeeder implements ApplicationListener<@NotNull ContextRefreshedEvent> {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +43,7 @@ public class DBSeeder implements ApplicationListener<ContextRefreshedEvent> {
         Arrays.stream(roleNames).forEach(roleName -> {
             Optional<Role> optionalRole = roleRepository.findByName(roleName);
 
-            optionalRole.ifPresentOrElse(role -> log.debug("Role already exists: {}", role), () -> {
+            optionalRole.ifPresentOrElse(role -> log.info("Role already exists: {}", role), () -> {
                 Role roleToCreate = new Role();
                 roleToCreate
                         .setName(roleName)
@@ -62,7 +63,7 @@ public class DBSeeder implements ApplicationListener<ContextRefreshedEvent> {
         Optional<User> optionalUser = userRepository.findByUsername(userDto.getUsername());
 
         if (optionalRole.isEmpty() || optionalUser.isPresent()) {
-            log.debug("Super Admin not created");
+            log.info("Super Admin not created");
             return;
         }
 
@@ -71,7 +72,7 @@ public class DBSeeder implements ApplicationListener<ContextRefreshedEvent> {
                 .setPassword(passwordEncoder.encode(userDto.getPassword()))
                 .setRole(optionalRole.get());
 
-        log.debug("Super Admin created with username: {}", user.getUsername());
+        log.info("Super Admin created with username: {}", user.getUsername());
 
         userRepository.save(user);
     }

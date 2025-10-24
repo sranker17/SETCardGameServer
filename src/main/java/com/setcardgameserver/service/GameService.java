@@ -43,7 +43,7 @@ public class GameService {
 
         do {
             newGameId = random.nextInt(99999);
-        } while (redisGameService.getGames().containsKey(newGameId));
+        } while (redisGameService.gameExists(newGameId));
 
         game.setId(newGameId);
         game.setPlayer1(player);
@@ -56,11 +56,11 @@ public class GameService {
 
     public Game connectToGame(String player2, int gameId) {
         log.info("Connecting player to game: {}", player2);
-        if (!redisGameService.getGames().containsKey(gameId)) {
+        if (!redisGameService.gameExists(gameId)) {
             return new Game();
         }
 
-        Game game = redisGameService.getGames().get(gameId);
+        Game game = redisGameService.getGame(gameId);
 
         if (game.getPlayer2() != null) {
             return new Game();
@@ -75,39 +75,30 @@ public class GameService {
 
     public Game connectToRandomGame(String player2) throws GameNotFoundException {
         log.info("Connecting player to random game: {}", player2);
-        Game game;
-        Optional<Game> hasGame = redisGameService.getGames().values().stream()
+        Game game = redisGameService.getGames().values().stream()
                 .filter(it -> it.getStatus().equals(GameStatus.NEW))
-                .findFirst();
+                .findFirst()
+                .orElse(createNewRandomGame(player2));
 
-        if (hasGame.isEmpty()) {
+        if (game.getPlayer1().equals(player2)) {
+            removeGame(game.getId());
             game = createNewRandomGame(player2);
-            log.debug("isEmpty");
-        } else {
-            game = redisGameService.getGames().values().stream()
-                    .filter(it -> it.getStatus().equals(GameStatus.NEW))
-                    .findFirst().orElseThrow(() -> new GameNotFoundException("Game not found while connecting to random game"));
-
-            if (game.getPlayer1().equals(player2)) {
-                removeGame(game.getId());
-                game = createNewRandomGame(player2);
-                log.debug("same game");
-                return game;
-            }
-
-            if (game.getPlayer2() != null && game.getPlayer2().equals(player2)) {
-                redisGameService.removeGame(game);
-                game = createNewRandomGame(player2);
-                log.debug("left game");
-                return game;
-            }
-
-            game.setPlayer2(player2);
-            game.getPoints().put(player2, 0);
-            game.setStatus(GameStatus.IN_PROGRESS);
-            redisGameService.setGame(game);
-            log.debug("isPresent");
+            log.debug("same game");
+            return game;
         }
+
+        if (game.getPlayer2() != null && game.getPlayer2().equals(player2)) {
+            redisGameService.removeGame(game.getId());
+            game = createNewRandomGame(player2);
+            log.debug("left game");
+            return game;
+        }
+
+        game.setPlayer2(player2);
+        game.getPoints().put(player2, 0);
+        game.setStatus(GameStatus.IN_PROGRESS);
+        redisGameService.setGame(game);
+        log.debug("isPresent");
         return game;
     }
 
@@ -126,15 +117,15 @@ public class GameService {
 
     public Game buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, GameNotFoundException {
         log.info("Button pressed: {}", buttonPress.getPlayerId());
-        if (!redisGameService.getGames().containsKey(buttonPress.getGameId())) {
+        if (!redisGameService.gameExists(buttonPress.getGameId())) {
             log.debug("Game not found on button press");
             return new Game(buttonPress.getGameId(), buttonPress.getPlayerId(), true);
         }
 
-        Game game = redisGameService.getGames().get(buttonPress.getGameId());
+        Game game = redisGameService.getGame(buttonPress.getGameId());
 
         if (game.getStatus().equals(GameStatus.FINISHED)) {
-            redisGameService.removeGame(game);
+            redisGameService.removeGame(game.getId());
             throw new InvalidGameException("Game is already finished");
         }
 
@@ -160,14 +151,14 @@ public class GameService {
 
     public Game gameplay(GameplayDto gameplayDto) throws GameNotFoundException, InvalidGameException {
         log.info("Gameplay: {}", gameplayDto.getPlayerId());
-        if (!redisGameService.getGames().containsKey(gameplayDto.getGameId())) {
+        if (!redisGameService.gameExists(gameplayDto.getGameId())) {
             throw new GameNotFoundException("Game not found while in gameplay");
         }
 
-        Game game = redisGameService.getGames().get(gameplayDto.getGameId());
+        Game game = redisGameService.getGame(gameplayDto.getGameId());
 
         if (game.getStatus().equals(GameStatus.FINISHED)) {
-            redisGameService.removeGame(game);
+            redisGameService.removeGame(game.getId());
             throw new InvalidGameException("Game with id %s is already finished".formatted(game.getId()));
         }
         if (game.getBlockedBy() != null) {
@@ -190,7 +181,7 @@ public class GameService {
                     if (!game.hasSet(game.getBoard())) {
                         game.setWinner(game.calculateWinner());
                         game.setStatus(GameStatus.FINISHED);
-                        redisGameService.removeGame(game);
+                        redisGameService.removeGame(game.getId());
                     }
                 }
                 game.setBlockedBy(null);
@@ -202,20 +193,18 @@ public class GameService {
 
     public Game getGameById(int gameId) throws GameNotFoundException {
         log.info("Getting game by id: {}", gameId);
-        if (!redisGameService.getGames().containsKey(gameId)) {
+        if (!redisGameService.gameExists(gameId)) {
             throw new GameNotFoundException("Game not found with id %s".formatted(gameId));
         }
-        return redisGameService.getGames().get(gameId);
+        return redisGameService.getGame(gameId);
     }
 
     public void removeGame(int gameId) throws GameNotFoundException {
         log.info("Removing game: {}", gameId);
-        if (!redisGameService.getGames().containsKey(gameId)) {
+        if (!redisGameService.gameExists(gameId)) {
             throw new GameNotFoundException("Game with id %S not found while removing game".formatted(gameId));
         }
-
-        Game game = redisGameService.getGames().get(gameId);
-        redisGameService.removeGame(game);
+        redisGameService.removeGame(gameId);
     }
 
     public void destroyAllGames() {

@@ -83,7 +83,7 @@ public class GameController {
         GameDto gameDto = null;
         try {
             gameDto = gameMapper.entityToDto(gameService.gameplay(gameplayDto));
-            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getId(), gameDto);
         } catch (InvalidGameException | GameNotFoundException e) {
             log.error(e.getMessage());
         }
@@ -97,7 +97,7 @@ public class GameController {
         GameDto gameDto = null;
         try {
             gameDto = gameMapper.entityToDto(gameService.buttonPress(buttonPress));
-            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getId(), gameDto);
         } catch (InvalidGameException e) {
             log.error(e.getMessage());
         } catch (GameNotFoundException e) {

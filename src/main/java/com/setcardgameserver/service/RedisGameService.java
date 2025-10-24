@@ -59,13 +59,6 @@ public class RedisGameService {
     }
 
     /**
-     * Update an existing game in Redis
-     */
-    public void removeGame(Game game) {
-        removeGame(game.getId());
-    }
-
-    /**
      * Remove a game by ID
      */
     public void removeGame(Integer gameId) {
@@ -105,8 +98,7 @@ public class RedisGameService {
     public Game getGame(Integer gameId) {
         String gameKey = GAME_PREFIX + gameId;
         try {
-            Object game = redisTemplate.opsForValue().get(gameKey);
-            return (Game) game;
+            return (Game) redisTemplate.opsForValue().get(gameKey);
         } catch (Exception e) {
             log.error("Error retrieving game {} from Redis: {}", gameId, e.getMessage());
         }
@@ -135,19 +127,6 @@ public class RedisGameService {
         } catch (Exception e) {
             log.error("Error checking if game {} exists in Redis: {}", gameId, e.getMessage());
             return false;
-        }
-    }
-
-    /**
-     * Extend the expiry time for a game
-     */
-    public void extendGameExpiry(Integer gameId) {
-        String gameKey = GAME_PREFIX + gameId;
-        try {
-            redisTemplate.expire(gameKey, GAME_EXPIRY);
-            log.info("Extended expiry for game {}", gameId);
-        } catch (Exception e) {
-            log.error("Error extending expiry for game {} in Redis: {}", gameId, e.getMessage());
         }
     }
 }

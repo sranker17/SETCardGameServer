@@ -1,5 +1,7 @@
 package com.setcardgameserver.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +11,11 @@ import java.util.*;
 @Data
 @Slf4j
 @NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Game {
     private static final int BOARD_SIZE = 9;
-    private int id;
+    private Integer id;
     private String player1;
     private String player2;
     private GameStatus status;

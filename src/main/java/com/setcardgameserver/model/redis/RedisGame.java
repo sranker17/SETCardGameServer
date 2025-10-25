@@ -1,23 +1,33 @@
-package com.setcardgameserver.model;
+package com.setcardgameserver.model.redis;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.setcardgameserver.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.redis.core.index.Indexed;
 
+import java.io.Serializable;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Data
-@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Game {
+@Slf4j
+@RedisHash(value = "game", timeToLive = 3600) // 1 óra
+public class RedisGame implements Serializable {
     private static final int BOARD_SIZE = 9;
-    private Integer id;
+    @Id
+    private Integer gameId;
+    @Indexed
     private String player1;
+    @Indexed
     private String player2;
+    @Indexed
     private GameStatus status;
     private ArrayList<Card> board = new ArrayList<>();
     private String winner;
@@ -28,8 +38,11 @@ public class Game {
     private ArrayList<Integer> nullCardIndexes = new ArrayList<>();
     private boolean playerLeft = false;
 
-    public Game(int id, String winner, boolean playerLeft) {
-        this.id = id;
+    @TimeToLive(unit = TimeUnit.SECONDS)
+    private Long ttl;
+
+    public RedisGame(int gameId, String winner, boolean playerLeft) {
+        this.gameId = gameId;
         this.winner = winner;
         this.playerLeft = playerLeft;
     }

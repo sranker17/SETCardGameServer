@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,14 +32,14 @@ public class User extends BaseEntity implements UserDetails, Serializable {
     private Role role;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NotNull Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());
 
         return List.of(authority);
     }
 
     @Override
-    public String getUsername() {
+    public @NotNull String getUsername() {
         return username;
     }
 }

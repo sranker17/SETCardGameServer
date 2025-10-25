@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameDto {
-    private Integer id;
+    private Integer gameId;
     private String player1;
     private String player2;
     private ArrayList<Card> board;

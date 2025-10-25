@@ -4,7 +4,7 @@ import com.setcardgameserver.exception.GameNotFoundException;
 import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.mapper.GameMapper;
 import com.setcardgameserver.model.dto.*;
-import com.setcardgameserver.service.GameService;
+import com.setcardgameserver.service.RedisGameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @AllArgsConstructor
 @Slf4j
 public class GameController {
-    private final GameService gameService;
+    private final RedisGameService gameService;
     private final GameMapper gameMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private static final String TOPIC_WAITING = "/topic/waiting";
@@ -29,9 +29,9 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.createGame(usernameDto.getUsername()));
+            gameDto = gameMapper.redisGameToDto(gameService.createGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (GameNotFoundException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -41,7 +41,7 @@ public class GameController {
     public GameDto connect(@RequestBody ConnectRequestDto request) {
         log.debug("connect to private game request: {} {}", request.getGameId(), request.getPlayerId());
 
-        GameDto gameDto = gameMapper.entityToDto(gameService.connectToGame(request.getPlayerId(), request.getGameId()));
+        GameDto gameDto = gameMapper.redisGameToDto(gameService.joinGame(request.getGameId(), request.getPlayerId()));
         simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         return gameDto;
     }
@@ -52,9 +52,9 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(usernameDto.getUsername()));
+            gameDto = gameMapper.redisGameToDto(gameService.joinRandomGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (GameNotFoundException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
@@ -67,7 +67,7 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.getGameById(gameIdDto.getGameId()));
+            gameDto = gameMapper.redisGameToDto(gameService.getGameById(gameIdDto.getGameId()));
             simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameIdDto.getGameId(), gameDto);
         } catch (GameNotFoundException e) {
             log.error(e.getMessage());
@@ -82,8 +82,8 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.gameplay(gameplayDto));
-            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getId(), gameDto);
+            gameDto = gameMapper.redisGameToDto(gameService.gameplay(gameplayDto));
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
         } catch (InvalidGameException | GameNotFoundException e) {
             log.error(e.getMessage());
         }
@@ -96,8 +96,8 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.buttonPress(buttonPress));
-            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getId(), gameDto);
+            gameDto = gameMapper.redisGameToDto(gameService.buttonPress(buttonPress));
+            simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
         } catch (InvalidGameException e) {
             log.error(e.getMessage());
         } catch (GameNotFoundException e) {
@@ -110,11 +110,7 @@ public class GameController {
     public String destroyGame(@RequestBody GameIdDto gameIdDto) {
         log.debug("destroy game {}", gameIdDto.getGameId());
 
-        try {
-            gameService.removeGame(gameIdDto.getGameId());
-        } catch (GameNotFoundException e) {
-            log.error(e.getMessage());
-        }
+        gameService.deleteGame(gameIdDto.getGameId());
         simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");
         return "Done";
     }
@@ -123,6 +119,6 @@ public class GameController {
     public void destroyAllGames(@RequestBody UsernameDto usernameDto) {
         log.debug("destroy all games by {}", usernameDto.getUsername());
 
-        gameService.destroyAllGames();
+        gameService.deleteAllGames();
     }
 }

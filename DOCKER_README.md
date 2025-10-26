@@ -67,6 +67,8 @@ The Docker setup uses these environment variables:
 - `SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/setcardgame...`
 - `SPRING_DATASOURCE_USERNAME=root`
 - `SPRING_DATASOURCE_PASSWORD=password`
+- `SUPER_ADMIN_USERNAME=admin`
+- `SUPER_ADMIN_PASSWORD=password`
 
 ## Data Persistence
 

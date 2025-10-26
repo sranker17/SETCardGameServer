@@ -43,6 +43,11 @@ The `docker-compose.prod.yml` file is configured for production deployment with 
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
+### Rebuild the application:
+```bash
+docker-compose -f docker-compose.prod.yml up --build -d
+```
+
 ### View logs:
 ```bash
 docker-compose -f docker-compose.prod.yml logs -f app

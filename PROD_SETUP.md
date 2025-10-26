@@ -27,13 +27,17 @@ The `docker-compose.prod.yml` file is configured for production deployment with 
 2. Update `production.env` with your actual values:
    ```bash
    # Production Database Configuration
-   SPRING_DATASOURCE_URL=jdbc:mysql://your-production-db-host:3306/your-database
-   SPRING_DATASOURCE_USERNAME=your-db-username
-   SPRING_DATASOURCE_PASSWORD=your-db-password
+   DB_URL=jdbc:mysql://your-production-db-host:3306/your-database
+   DB_USERNAME=your-db-username
+   DB_PASSWORD=your-db-password
    
    # JWT Security (use strong secret in production)
    JWT_SECRET=your-very-strong-jwt-secret-key
    JWT_EXPIRATION_TIME=3600000
+   
+   # Super Admin Credentials
+   SUPER_ADMIN_USERNAME=admin
+   SUPER_ADMIN_PASSWORD=your-super-admin-password
    ```
 
 ## Running in Production

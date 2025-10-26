@@ -6,7 +6,7 @@ import com.setcardgameserver.model.User;
 import com.setcardgameserver.model.dto.AuthUserDto;
 import com.setcardgameserver.repository.RoleRepository;
 import com.setcardgameserver.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Component
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DBSeeder implements ApplicationListener<@NotNull ContextRefreshedEvent> {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;

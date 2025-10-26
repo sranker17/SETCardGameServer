@@ -1,4 +1,4 @@
-package com.setcardgameserver.bootstrap;
+package com.setcardgameserver.config;
 
 import com.setcardgameserver.model.Role;
 import com.setcardgameserver.model.RoleEnum;
@@ -9,6 +9,7 @@ import com.setcardgameserver.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +26,10 @@ public class DBSeeder implements ApplicationListener<@NotNull ContextRefreshedEv
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    @Value("${super.admin.username}")
+    private String superAdminUsername;
+    @Value("${super.admin.password}")
+    private String superAdminPassword;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -56,8 +61,7 @@ public class DBSeeder implements ApplicationListener<@NotNull ContextRefreshedEv
 
     private void createSuperAdministrator() {
         AuthUserDto userDto = new AuthUserDto();
-        //TODO: Change the default super admin credentials
-        userDto.setUsername("super_admin").setPassword("123456");
+        userDto.setUsername(superAdminUsername).setPassword(superAdminPassword);
 
         Optional<Role> optionalRole = roleRepository.findByName(RoleEnum.SUPER_ADMIN);
         Optional<User> optionalUser = userRepository.findByUsername(userDto.getUsername());

@@ -1,10 +1,10 @@
 package com.setcardgameserver.mapper;
 
 import com.setcardgameserver.model.dto.GameDto;
-import com.setcardgameserver.model.redis.RedisGame;
+import com.setcardgameserver.model.Game;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface GameMapper {
-    GameDto redisGameToDto(RedisGame redisGame);
+    GameDto redisGameToDto(Game game);
 }

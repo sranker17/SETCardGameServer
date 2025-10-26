@@ -5,8 +5,8 @@ import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.model.GameStatus;
 import com.setcardgameserver.model.dto.GameplayButtonPress;
 import com.setcardgameserver.model.dto.GameplayDto;
-import com.setcardgameserver.model.redis.RedisGame;
-import com.setcardgameserver.repository.RedisGameRepository;
+import com.setcardgameserver.model.Game;
+import com.setcardgameserver.repository.GameRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,26 +16,26 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RedisGameService {
+public class GameService {
 
-    private final RedisGameRepository redisGameRepository;
+    private final GameRepository gameRepository;
     private static final Random random = new Random();
 
     /**
      * Játék létrehozása
      */
-    public RedisGame createGame(String player1) {
+    public Game createGame(String player1) {
         log.info("Creating game for player: {}", player1);
 
         // Ellenőrizzük, hogy van-e már játéka
-        List<RedisGame> existingGames = redisGameRepository.findByPlayer1(player1);
+        List<Game> existingGames = gameRepository.findByPlayer1(player1);
         if (!existingGames.isEmpty()) {
             log.info("Player {} already has a game, deleting old games", player1);
-            redisGameRepository.deleteAll(existingGames);
+            gameRepository.deleteAll(existingGames);
         }
 
         // Új játék létrehozása
-        RedisGame game = new RedisGame();
+        Game game = new Game();
         game.setGameId(generateUniqueGameId());
         game.setPlayer1(player1);
         game.setStatus(GameStatus.WAITING);
@@ -43,22 +43,22 @@ public class RedisGameService {
         game.createGame();
 
         // Mentés Redis-be
-        return redisGameRepository.save(game);
+        return gameRepository.save(game);
     }
 
     /**
      * Csatlakozás játékhoz
      */
-    public RedisGame joinGame(Integer gameId, String player2) {
+    public Game joinGame(Integer gameId, String player2) {
         log.info("Player {} joining game {}", player2, gameId);
 
-        Optional<RedisGame> gameOpt = redisGameRepository.findById(gameId);
+        Optional<Game> gameOpt = gameRepository.findById(gameId);
         if (gameOpt.isEmpty()) {
             log.error("Game {} not found", gameId);
             return null;
         }
 
-        RedisGame game = gameOpt.get();
+        Game game = gameOpt.get();
 
         if (game.getPlayer2() != null) {
             log.error("Game {} already has a second player", gameId);
@@ -69,17 +69,17 @@ public class RedisGameService {
         game.setStatus(GameStatus.IN_PROGRESS);
         game.getPoints().put(player2, 0);
 
-        return redisGameRepository.save(game);
+        return gameRepository.save(game);
     }
 
-    public RedisGame joinRandomGame(String player2) {
+    public Game joinRandomGame(String player2) {
         log.info("Connecting player to random game: {}", player2);
 
         // Keresés NEW státuszú játék után
-        List<RedisGame> newGames = redisGameRepository.findByStatus(GameStatus.NEW);
-        Optional<RedisGame> gameOpt = newGames.stream().findFirst();
+        List<Game> newGames = gameRepository.findByStatus(GameStatus.NEW);
+        Optional<Game> gameOpt = newGames.stream().findFirst();
 
-        RedisGame game;
+        Game game;
         if (gameOpt.isEmpty()) {
             game = createNewRandomGame(player2);
             log.debug("isEmpty");
@@ -107,7 +107,7 @@ public class RedisGameService {
         game.setStatus(GameStatus.IN_PROGRESS);
         game.setSelectedCardIndexes(new ArrayList<>());
         game.setNullCardIndexes(new ArrayList<>());
-        redisGameRepository.save(game);
+        gameRepository.save(game);
         log.debug("isPresent");
         return game;
     }
@@ -115,9 +115,9 @@ public class RedisGameService {
     /**
      * Új random játék létrehozása
      */
-    private RedisGame createNewRandomGame(String player) {
+    private Game createNewRandomGame(String player) {
         log.info("Creating new random game for player: {}", player);
-        RedisGame newGame = new RedisGame();
+        Game newGame = new Game();
         newGame.setGameId(generateUniqueGameId());
         newGame.setPlayer1(player);
         newGame.setStatus(GameStatus.NEW);
@@ -129,22 +129,22 @@ public class RedisGameService {
         newGame.setNullCardIndexes(new ArrayList<>());
         newGame.createGame();
 
-        return redisGameRepository.save(newGame);
+        return gameRepository.save(newGame);
     }
 
-    public RedisGame getGameById(Integer gameId) throws GameNotFoundException {
-        return redisGameRepository.findById(gameId)
+    public Game getGameById(Integer gameId) throws GameNotFoundException {
+        return gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameNotFoundException("Game with ID " + gameId + " not found"));
     }
 
     public void deleteGame(Integer gameId) {
         log.info("Deleting game {}", gameId);
-        redisGameRepository.deleteById(gameId);
+        gameRepository.deleteById(gameId);
     }
 
     public void deleteAllGames() {
         log.info("Deleting all games from Redis");
-        redisGameRepository.deleteAll();
+        gameRepository.deleteAll();
     }
 
     /**
@@ -154,23 +154,23 @@ public class RedisGameService {
         int gameId;
         do {
             gameId = random.nextInt(99999);
-        } while (redisGameRepository.existsById(gameId));
+        } while (gameRepository.existsById(gameId));
         return gameId;
     }
 
-    public RedisGame buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, GameNotFoundException {
+    public Game buttonPress(GameplayButtonPress buttonPress) throws InvalidGameException, GameNotFoundException {
         log.info("Button pressed: {}", buttonPress.getPlayerId());
 
-        Optional<RedisGame> gameOpt = redisGameRepository.findById(buttonPress.getGameId());
+        Optional<Game> gameOpt = gameRepository.findById(buttonPress.getGameId());
         if (gameOpt.isEmpty()) {
             log.debug("RedisGame not found on button press");
-            return redisGameRepository.save(new RedisGame(buttonPress.getGameId(), buttonPress.getPlayerId(), true));
+            return gameRepository.save(new Game(buttonPress.getGameId(), buttonPress.getPlayerId(), true));
         }
 
-        RedisGame game = gameOpt.get();
+        Game game = gameOpt.get();
 
         if (game.getStatus() == null || game.getStatus().equals(GameStatus.FINISHED)) {
-            redisGameRepository.deleteById(game.getGameId());
+            gameRepository.deleteById(game.getGameId());
             throw new InvalidGameException("RedisGame is already finished");
         }
 
@@ -178,7 +178,7 @@ public class RedisGameService {
             log.debug("same player pressed the button");
             game.setBlockedBy(null);
             game.clearSelectedCardIndexes();
-            return redisGameRepository.save(game);
+            return gameRepository.save(game);
         }
 
         if (game.getBlockedBy() != null) {
@@ -191,21 +191,21 @@ public class RedisGameService {
         }
         game.setBlockedBy(buttonPress.getPlayerId());
 
-        return redisGameRepository.save(game);
+        return gameRepository.save(game);
     }
 
-    public RedisGame gameplay(GameplayDto gameplayDto) throws GameNotFoundException, InvalidGameException {
+    public Game gameplay(GameplayDto gameplayDto) throws GameNotFoundException, InvalidGameException {
         log.info("Gameplay: {}", gameplayDto.getPlayerId());
 
-        Optional<RedisGame> gameOpt = redisGameRepository.findById(gameplayDto.getGameId());
+        Optional<Game> gameOpt = gameRepository.findById(gameplayDto.getGameId());
         if (gameOpt.isEmpty()) {
             throw new GameNotFoundException("RedisGame not found while in gameplay");
         }
 
-        RedisGame game = gameOpt.get();
+        Game game = gameOpt.get();
 
         if (game.getStatus().equals(GameStatus.FINISHED)) {
-            redisGameRepository.deleteById(game.getGameId());
+            gameRepository.deleteById(game.getGameId());
             throw new InvalidGameException("RedisGame with id %s is already finished".formatted(game.getGameId()));
         }
 
@@ -217,10 +217,10 @@ public class RedisGameService {
             return game;
         }
 
-        return redisGameRepository.save(game);
+        return gameRepository.save(game);
     }
 
-    private void handleGameplayWhenBlockActive(GameplayDto gameplayDto, RedisGame game) {
+    private void handleGameplayWhenBlockActive(GameplayDto gameplayDto, Game game) {
         if (gameplayDto.isSelect()) {
             if (game.getSelectedCardIndexSize() == 3) {
                 game.clearSelectedCardIndexes();
@@ -234,7 +234,7 @@ public class RedisGameService {
                     if (!game.hasSet(game.getBoard())) {
                         game.setWinner(game.calculateWinner());
                         game.setStatus(GameStatus.FINISHED);
-                        redisGameRepository.deleteById(game.getGameId());
+                        gameRepository.deleteById(game.getGameId());
                     }
                 }
                 game.setBlockedBy(null);

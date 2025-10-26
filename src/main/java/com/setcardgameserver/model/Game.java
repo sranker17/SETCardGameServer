@@ -1,6 +1,5 @@
-package com.setcardgameserver.model.redis;
+package com.setcardgameserver.model;
 
-import com.setcardgameserver.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @Slf4j
 @RedisHash(value = "game", timeToLive = 3600) // 1 óra
-public class RedisGame implements Serializable {
+public class Game implements Serializable {
     private static final int BOARD_SIZE = 9;
     @Id
     private Integer gameId;
@@ -41,7 +40,7 @@ public class RedisGame implements Serializable {
     @TimeToLive(unit = TimeUnit.SECONDS)
     private Long ttl;
 
-    public RedisGame(int gameId, String winner, boolean playerLeft) {
+    public Game(int gameId, String winner, boolean playerLeft) {
         this.gameId = gameId;
         this.winner = winner;
         this.playerLeft = playerLeft;

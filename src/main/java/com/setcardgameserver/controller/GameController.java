@@ -4,7 +4,7 @@ import com.setcardgameserver.exception.GameNotFoundException;
 import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.mapper.GameMapper;
 import com.setcardgameserver.model.dto.*;
-import com.setcardgameserver.service.RedisGameService;
+import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @AllArgsConstructor
 @Slf4j
 public class GameController {
-    private final RedisGameService gameService;
+    private final GameService gameService;
     private final GameMapper gameMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
     private static final String TOPIC_WAITING = "/topic/waiting";

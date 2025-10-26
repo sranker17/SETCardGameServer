@@ -5,6 +5,7 @@ import com.setcardgameserver.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class UserController {
     @Operation(summary = "Get logged in user", description = "Get logged in user, needs authentication")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
-    public ResponseEntity<UserDto> authenticatedUser() {
+    public ResponseEntity<@NotNull UserDto> authenticatedUser() {
         return ResponseEntity.ok(userService.getOwnUser());
     }
 

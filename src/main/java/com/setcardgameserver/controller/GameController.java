@@ -31,7 +31,7 @@ public class GameController {
         try {
             gameDto = gameMapper.entityToDto(gameService.createGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (GameNotFoundException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
         return gameDto;
@@ -41,7 +41,7 @@ public class GameController {
     public GameDto connect(@RequestBody ConnectRequestDto request) {
         log.debug("connect to private game request: {} {}", request.getGameId(), request.getPlayerId());
 
-        GameDto gameDto = gameMapper.entityToDto(gameService.connectToGame(request.getPlayerId(), request.getGameId()));
+        GameDto gameDto = gameMapper.entityToDto(gameService.joinGame(request.getGameId(), request.getPlayerId()));
         simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
         return gameDto;
     }
@@ -52,9 +52,9 @@ public class GameController {
 
         GameDto gameDto = null;
         try {
-            gameDto = gameMapper.entityToDto(gameService.connectToRandomGame(usernameDto.getUsername()));
+            gameDto = gameMapper.entityToDto(gameService.joinRandomGame(usernameDto.getUsername()));
             simpMessagingTemplate.convertAndSend(TOPIC_WAITING, gameDto);
-        } catch (GameNotFoundException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
 
@@ -110,11 +110,7 @@ public class GameController {
     public String destroyGame(@RequestBody GameIdDto gameIdDto) {
         log.debug("destroy game {}", gameIdDto.getGameId());
 
-        try {
-            gameService.removeGame(gameIdDto.getGameId());
-        } catch (GameNotFoundException e) {
-            log.error(e.getMessage());
-        }
+        gameService.deleteGame(gameIdDto.getGameId());
         simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");
         return "Done";
     }
@@ -123,6 +119,6 @@ public class GameController {
     public void destroyAllGames(@RequestBody UsernameDto usernameDto) {
         log.debug("destroy all games by {}", usernameDto.getUsername());
 
-        gameService.destroyAllGames();
+        gameService.deleteAllGames();
     }
 }

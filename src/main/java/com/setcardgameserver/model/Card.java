@@ -1,18 +1,18 @@
 package com.setcardgameserver.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 @Data
 @ToString
-public class Card {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Card implements Serializable {
     private Color color;
     private Shape shape;
     private Quantity quantity;
-
-    public Card(Color color, Shape shape, Quantity quantity) {
-        this.color = color;
-        this.shape = shape;
-        this.quantity = quantity;
-    }
 }

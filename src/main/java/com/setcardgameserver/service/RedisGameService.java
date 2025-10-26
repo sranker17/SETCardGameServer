@@ -164,12 +164,12 @@ public class RedisGameService {
         Optional<RedisGame> gameOpt = redisGameRepository.findById(buttonPress.getGameId());
         if (gameOpt.isEmpty()) {
             log.debug("RedisGame not found on button press");
-            return new RedisGame(buttonPress.getGameId(), buttonPress.getPlayerId(), true);
+            return redisGameRepository.save(new RedisGame(buttonPress.getGameId(), buttonPress.getPlayerId(), true));
         }
 
         RedisGame game = gameOpt.get();
 
-        if (game.getStatus().equals(GameStatus.FINISHED)) {
+        if (game.getStatus() == null || game.getStatus().equals(GameStatus.FINISHED)) {
             redisGameRepository.deleteById(game.getGameId());
             throw new InvalidGameException("RedisGame is already finished");
         }
@@ -178,7 +178,7 @@ public class RedisGameService {
             log.debug("same player pressed the button");
             game.setBlockedBy(null);
             game.clearSelectedCardIndexes();
-            return game;
+            return redisGameRepository.save(game);
         }
 
         if (game.getBlockedBy() != null) {
@@ -211,6 +211,10 @@ public class RedisGameService {
 
         if (game.getBlockedBy() != null) {
             handleGameplayWhenBlockActive(gameplayDto, game);
+        }
+
+        if (GameStatus.FINISHED.equals(game.getStatus())) {
+            return game;
         }
 
         return redisGameRepository.save(game);

@@ -1,7 +1,8 @@
 package com.setcardgameserver.mapper;
 
-import com.setcardgameserver.dto.ScoreboardDto;
 import com.setcardgameserver.model.Scoreboard;
+import com.setcardgameserver.model.dto.ScoreboardDto;
+import com.setcardgameserver.model.dto.ScoreboardWithUserScoreDto;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -12,5 +13,7 @@ public interface ScoreboardMapper {
 
     ScoreboardDto entityToDto(Scoreboard scoreboard);
 
-    List<ScoreboardDto> entityListToDto(List<Scoreboard> scoreboardList);
+    List<ScoreboardDto> entityListToDtoList(List<Scoreboard> scoreboardList);
+
+    List<ScoreboardWithUserScoreDto> entityListToTopDtoList(List<Scoreboard> scoreboardList);
 }

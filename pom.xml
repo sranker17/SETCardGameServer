@@ -9,9 +9,9 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>com.setcardgameserver</groupId>
     <artifactId>SETCardGameServer</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.3-SNAPSHOT</version>
     <name>SETCardGameServer</name>
     <description>SET Card Game Server for saving scores and hosting multiplayer games.</description>
     <properties>

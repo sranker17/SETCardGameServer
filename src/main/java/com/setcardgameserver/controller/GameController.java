@@ -3,6 +3,7 @@ package com.setcardgameserver.controller;
 import com.setcardgameserver.exception.GameNotFoundException;
 import com.setcardgameserver.exception.InvalidGameException;
 import com.setcardgameserver.mapper.GameMapper;
+import com.setcardgameserver.model.Game;
 import com.setcardgameserver.model.dto.*;
 import com.setcardgameserver.service.GameService;
 import lombok.AllArgsConstructor;
@@ -108,7 +109,19 @@ public class GameController {
 
     @MessageMapping("/game/destroy")
     public String destroyGame(@RequestBody GameIdDto gameIdDto) {
-        log.debug("destroy game {}", gameIdDto.getGameId());
+        log.debug("destroy game {} by {}", gameIdDto.getGameId(), gameIdDto.getPlayerId());
+
+        try {
+            Game game = gameService.destroyGameWithWinnerCheck(gameIdDto.getGameId(), gameIdDto.getPlayerId());
+            
+            // Ha van másik játékos és a játék folyamatban volt, küldjük el a nyertes üzenetet
+            if (game != null) {
+                GameDto gameDto = gameMapper.entityToDto(game);
+                simpMessagingTemplate.convertAndSend(TOPIC_GAME_PROGRESS + gameDto.getGameId(), gameDto);
+            }
+        } catch (GameNotFoundException e) {
+            log.error(e.getMessage());
+        }
 
         gameService.deleteGame(gameIdDto.getGameId());
         simpMessagingTemplate.convertAndSend(TOPIC_DESTROYED + gameIdDto.getGameId(), "Done");

@@ -142,6 +142,40 @@ public class GameService {
         gameRepository.deleteById(gameId);
     }
 
+    /**
+     * Játék törlése másik játékos nyertesnek jelölésével, ha a játék még folyamatban van
+     * @param gameId a játék azonosítója
+     * @param playerId a játékos azonosítója, aki törli a játékot
+     * @return Game objektum, ha van másik játékos és a játék folyamatban van, különben null
+     * @throws GameNotFoundException ha a játék nem található
+     */
+    public Game destroyGameWithWinnerCheck(Integer gameId, String playerId) throws GameNotFoundException {
+        log.info("Destroying game {} by player {}", gameId, playerId);
+        
+        Game game = getGameById(gameId);
+        
+        // Ha a játék még folyamatban van, a másik játékost nyertesnek jelöljük
+        if (game.getStatus() != null && !game.getStatus().equals(GameStatus.FINISHED)) {
+            String otherPlayer = null;
+            if (game.getPlayer1() != null && !game.getPlayer1().equals(playerId)) {
+                otherPlayer = game.getPlayer1();
+            } else if (game.getPlayer2() != null && !game.getPlayer2().equals(playerId)) {
+                otherPlayer = game.getPlayer2();
+            }
+            
+            if (otherPlayer != null) {
+                game.setWinner(otherPlayer);
+                game.setBlockedBy(null);
+                game.setPlayerLeft(true);
+                game.setStatus(GameStatus.FINISHED);
+                log.info("Game {} finished, winner: {}", gameId, otherPlayer);
+                return game;
+            }
+        }
+        
+        return null;
+    }
+
     public void deleteAllGames() {
         log.info("Deleting all games from Redis");
         gameRepository.deleteAll();
